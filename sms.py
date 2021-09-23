@@ -25,3 +25,25 @@ def sending1(phone, password,fname,company_name):
         print(response)
     except Exception as e:
         print(f'Houston, something went wrong: ${e}')
+
+def sending2(phone, password,fname,company_name):
+    # TODO: Send message
+    recipients = [phone]
+    message = "Hi {}, Welcome to Erealtors, Your login Info is {}, YOu are now an Tenant of {} ".format(fname, password,company_name)
+    sender = 'AFRICASTKNG' # Place your SenderID here
+    try:
+        response = sms.send(message, recipients)
+        print(response)
+    except Exception as e:
+        print(f'Houston, something went wrong: ${e}')
+
+def sending3(phone, password,fname,company_name):
+    # TODO: Send message
+    recipients = [phone]
+    message = "Hi {}, Welcome to Erealtors, Your login Info is {}, YOu are now a Landlord of {} ".format(fname, password,company_name)
+    sender = 'AFRICASTKNG' # Place your SenderID here
+    try:
+        response = sms.send(message, recipients)
+        print(response)
+    except Exception as e:
+        print(f'Houston, something went wrong: ${e}')

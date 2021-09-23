@@ -517,7 +517,7 @@ def agent_login():
                     return redirect('/')
 
                 elif status == False:
-                    flash('Login Failed', 'danger')
+                    flash('Wrong Email or Password', 'danger')
                     return redirect('/agent_login')
                 else:
                     flash('Something went Wrong')
@@ -560,6 +560,85 @@ def addproperty():
         locations = cursor2.fetchall()
         return render_template('addproperty.html', categories = categories, locations = locations)
 
+@app.route('/addtenant' , methods = ['POST', 'GET'])
+def addtenant():
+
+    if check_agent():
+        if request.method == "POST":
+            fname = request.form['fname']
+            lname = request.form['lname']
+            email = request.form['email']
+            tel_office = request.form['tel_office']
+            tel_personal = request.form['tel_personal']
+            company_name = request.form['company_name']
+            password = password_generator()
+            agent_id = session['agent_id']
+            cursor = con.cursor()
+            #check if phone already exists
+            sql0 = 'select * from tenants where tel_personal = %s'
+            cursor.execute(sql0,(tel_personal))
+            if cursor.rowcount > 0:
+                flash('Personal Phone Already in use', 'warning')
+                return render_template('addtenant.html')
+            else:
+                sql = "insert into tenants(fname, lname, email, password, tel_office , tel_personal , company_name,agent_id) values(%s,%s,%s,%s,%s,%s,%s,%s)"
+                try:
+                    cursor.execute(sql,(fname, lname, email, hash_password(password), tel_office,tel_personal, company_name,agent_id))
+                    con.commit()
+                    #send sms
+                    from sms import sending2
+                    sending2(tel_personal,password,fname,company_name)
+
+                    flash('Tenant Added Successfully', 'info')
+                    return render_template('addtenant.html')
+                except:
+                    flash('Tenant Add Fail', 'error')
+                    return render_template('addtenant.html' )
+        else:
+            return render_template('addtenant.html')
+    else:
+        return redirect('/agent_login')
+
+@app.route('/addlandlord' , methods = ['POST', 'GET'])
+def addlandlord():
+
+    if check_agent():
+        if request.method == "POST":
+            fname = request.form['fname']
+            lname = request.form['lname']
+            email = request.form['email']
+            tel_office = request.form['tel_office']
+            tel_personal = request.form['tel_personal']
+            company_name = request.form['company_name']
+            idno = request.form['idno']
+            password = password_generator()
+            agent_id = session['agent_id']
+            cursor = con.cursor()
+            #check if phone already exists
+            sql0 = 'select * from landlord where tel_personal = %s'
+            cursor.execute(sql0,(tel_personal))
+            if cursor.rowcount > 0:
+                flash('Personal Phone Already in use', 'warning')
+                return render_template('addlandlord.html')
+            else:
+                sql = "insert into landlord(fname, lname, email, password, tel_office , tel_personal , company_name,agent_id,idno) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                try:
+                    cursor.execute(sql,(fname, lname, email, hash_password(password), tel_office,tel_personal, company_name,agent_id,idno))
+                    con.commit()
+                    #send sms
+                    from sms import sending3
+                    sending3(tel_personal,password,fname,company_name)
+
+                    flash('Landlord Added Successfully', 'info')
+                    return render_template('addlandlord.html')
+                except:
+                    flash('Landlord Add Fail', 'error')
+                    return render_template('addlandlord.html' )
+        else:
+            return render_template('addlandlord.html')
+    else:
+        return redirect('/agent_login')
+
 
 def check_admin():
     if 'admin_id' in session:
@@ -573,6 +652,16 @@ def check_agency():
     else:
         return False
 
+def check_agent():
+    if 'agent_id' in session:
+        return True
+    else:
+        return False
+def check_agent():
+    if 'agent_id' in session:
+        return True
+    else:
+        return False
 
 
 def check_admin_agency():
