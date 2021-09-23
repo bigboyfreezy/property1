@@ -13,7 +13,7 @@ app.secret_key = 'A+4#s_T%P8g0@o?6'
 
 @app.route('/')
 def index():
-    if check_admin_agency():
+    if check_admin_agency_agent():
 
         return render_template('index.html')
     else:
@@ -73,20 +73,24 @@ def changepassword():
             if cursor.rowcount==0:
                 return redirect('/logout')
             else:
+                # fetchpassword..just one
                 row = cursor.fetchone()
                 hashed_password = row[4]
-                # verify
+                # verify the hashed and the password if they match
                 status = verify_password(hashed_password, currentpassword)
                 if status == True:
+                    # if new pass is not the same as confirm pass then they dont math and u render the template
                     if newpassword !=confirmpassword:
-                        return render_template('changepassword.html' , msg='Not Matching')
+                        flash('The password dont match', 'danger')
+                        return render_template('changepassword.html')
                     else:
                         con = pymysql.connect(host='localhost', user='root', password='', database='property')
                         sql = 'UPDATE admin SET password = %s where admin_id = %s'
                         cursor = con.cursor()
                         cursor.execute(sql,(hash_password(newpassword), session_key))
                         con.commit()
-                        return render_template('changepassword.html' , msg='Password change')
+                        flash('Password Changed')
+                        return render_template('changepassword.html')
 
                 else:
                     return render_template('changepassword.html', msg = 'Current password is incorrect')
@@ -97,7 +101,7 @@ def changepassword():
     else:
        return redirect('/login')
 
-
+# request.form then
 
 
 
@@ -271,7 +275,7 @@ def edit_agency(agency_id):
 
 
 
-#    .....................Agency routes..............
+#    ==================== Agency routes ======================
 
 @app.route('/agency_login', methods = ['GET','POST'])
 def agency_login():
@@ -439,8 +443,122 @@ def profileagency():
     else:
         return redirect('/login')
 
+@app.route('/agencychange', methods = ['POST', 'GET'])
+def agencychange():
+    if check_agency():
+        if request.method == 'POST':
+            session_key = session['agency_id']
+            currentpassword = request.form['currentpassword']
+            newpassword = request.form['newpassword']
+            confirmpassword = request.form['confirmpassword']
+
+            sql = 'select * from agency where agency_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (session_key))
+            if cursor.rowcount==0:
+                return redirect('/logout')
+            else:
+                # fetchpassword..just one
+                row = cursor.fetchone()
+                hashed_password = row[4]
+                # verify the hashed and the password if they match
+                status = verify_password(hashed_password, currentpassword)
+                if status == True:
+                    # if new pass is not the same as confirm pass then they dont math and u render the template
+                    if newpassword !=confirmpassword:
+                        flash('The password dont match', 'danger')
+                        return render_template('agencychange.html')
+                    else:
+                        con = pymysql.connect(host='localhost', user='root', password='', database='property')
+                        sql = 'UPDATE agency SET password = %s where agency_id = %s'
+                        cursor = con.cursor()
+                        cursor.execute(sql,(hash_password(newpassword), session_key))
+                        con.commit()
+                        flash('Password Changed','info')
+                        return render_template('agencychange.html')
+
+                else:
+                    flash('current Password is not correct','danger')
+                    return render_template('agencychange.html')
 
 
+        else:
+            return render_template('agencychange.html')
+    else:
+       return redirect('/login')
+
+
+# ================= Agent routes =========================
+
+@app.route('/agent_login', methods = ['GET','POST'])
+def agent_login():
+        if request.method == "POST":
+            email = request.form['email']
+            password = request.form['password']
+
+            #check if email exists
+            sql = 'select * from agent where email = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql,(email))
+            if cursor.rowcount == 0:
+                flash('Email does not exist', 'danger')
+                return redirect('/agent_login')
+            else:
+                row = cursor.fetchone()
+                hashed_password = row[4]
+                status = verify_password(hashed_password, password)
+                #verify
+                if status == True:
+                    # create session
+                    session['email'] = row[3]
+                    session['agent_id'] = row[0]
+                    session['fname'] = row[1]
+                    session['lname'] = row[2]
+                    return redirect('/')
+
+                elif status == False:
+                    flash('Login Failed', 'danger')
+                    return redirect('/agent_login')
+                else:
+                    flash('Something went Wrong')
+                    return redirect('/agent_login')
+
+        else:
+            return render_template('agent_login.html')
+
+
+@app.route('/addproperty', methods = ['POST','GET'])
+def addproperty():
+    if request.method == 'POST':
+           property_name = request.form['property_name']
+           property_category = request.form['property_category']
+           property_location = request.form['property_location']
+           address = request.form['address']
+           agent_id = 'agent_id'
+           landlord_id = '1'
+
+           cursor = con.cursor()
+           sql = 'insert into property(property_name, category_id, property_location, address,agent_id,landlord_id) values(%s,%s,%s,%s,%s,%s)'
+
+           cursor.execute(sql,(property_name,property_category,property_location,address,agent_id,landlord_id))
+           con.commit()
+           flash('Saved Successfully')
+           return redirect('/addproperty')
+
+
+    else:
+#         getting categories rows
+        sql1 = 'select * from property_category'
+        cursor1 = conn().cursor()
+        cursor1.execute(sql1)
+        categories = cursor1.fetchall()
+
+        # getting locations rows
+        sql2 = 'select * from property_location'
+        cursor2 = conn().cursor()
+        cursor2.execute(sql2)
+        locations = cursor2.fetchall()
+        return render_template('addproperty.html', categories = categories, locations = locations)
 
 
 def check_admin():
@@ -459,6 +577,13 @@ def check_agency():
 
 def check_admin_agency():
     if 'admin_id' in session or 'agency_id' in session:
+        return True
+    else:
+        return  False
+
+
+def check_admin_agency_agent():
+    if 'admin_id' in session or 'agency_id' in session or 'agent_id' in session:
         return True
     else:
         return  False

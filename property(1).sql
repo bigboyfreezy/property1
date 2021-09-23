@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 17, 2021 at 01:01 PM
+-- Generation Time: Sep 23, 2021 at 01:44 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.10
 
@@ -70,7 +70,7 @@ CREATE TABLE `agency` (
 --
 
 INSERT INTO `agency` (`agency_id`, `fname`, `lname`, `email`, `password`, `active`, `reg_date`, `admin_id`, `tel_office`, `tel_personal`, `company_name`) VALUES
-(15, 'Callum', 'Wilson', 'abdifarah076@gmail.com', '8a296d5403ddf7b848e42e37c5d5dac498c47fba7f06b08466c6d068d5d64791f9b7bf4d561e43fcfe3f3441cff4cd0bf1ec3c15f7bd93bf95720e0a4fc984c607e8944bc5b28ea0264a5ca2a029862e97142785d98bca071dcc00d9c5059e56', 'Yes', '2021-09-17 10:04:32', 1, '0723326918', '+254723326919', 'Callum Agency Ltd');
+(21, 'Callum', 'Wilsan', 'callum@gmail.com', '8dc34a5fd84f67cf3f1465d1d511b1571fc37880853bccf263bd910a2d8d2eedbe6aac5d648a54088e5edab8691966eb65cbd9a844afde072b83741b13ee899b49796c49ee97c772e8a9c0eed420059e37ef1a5c6a5c4cd5a9541f92d0cab113', 'Yes', '2021-09-23 09:41:17', 1, '+245722658975', '+254729225710', 'Callum Agency Ltd');
 
 -- --------------------------------------------------------
 
@@ -83,7 +83,7 @@ CREATE TABLE `agent` (
   `fname` varchar(50) NOT NULL,
   `lname` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
+  `password` varchar(500) NOT NULL,
   `active` varchar(100) NOT NULL DEFAULT 'Yes',
   `reg_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `agency_id` int(50) NOT NULL,
@@ -91,6 +91,13 @@ CREATE TABLE `agent` (
   `tel_personal` varchar(255) NOT NULL,
   `company_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `agent`
+--
+
+INSERT INTO `agent` (`agent_id`, `fname`, `lname`, `email`, `password`, `active`, `reg_date`, `agency_id`, `tel_office`, `tel_personal`, `company_name`) VALUES
+(5, 'Allan', 'Gray', 'allan@gmail.com', '102c0e772030d853168eef980facef5bc79b94e9680ed2a5e4c45d66dbb3b493953eeceb575f64d3ce49969cf5f0e3bdbd1274c566a6950c7c6ac44f5861ed5d111900c03023547e0699a0d023b85ca7c051e5b1cee97e79c37689b858b24200', 'Yes', '2021-09-23 09:52:04', 21, '+254812532578', '+254723326919', 'Allan Agency');
 
 -- --------------------------------------------------------
 
@@ -117,6 +124,13 @@ CREATE TABLE `landlord` (
   `idno` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `landlord`
+--
+
+INSERT INTO `landlord` (`lardlord_id`, `fname`, `lname`, `email`, `password`, `active`, `reg_date`, `agent_id`, `tel_office`, `tel_personal`, `company_name`, `address`, `bank_name`, `bank_acc`, `pin`, `idno`) VALUES
+(1, 'Karani', 'Mwangi', 'karani@gmail.com', '', 'Yes', '2021-09-23 10:31:56', 5, '', '+254789635822', '', 'CBD MOI AVENUE', 'EQUITY', '02545532689', '2589', '23566710');
+
 -- --------------------------------------------------------
 
 --
@@ -130,7 +144,8 @@ CREATE TABLE `property` (
   `agent_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `landlord_id` int(11) NOT NULL,
-  `address` varchar(100) NOT NULL
+  `address` varchar(100) NOT NULL,
+  `property_location` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -146,6 +161,14 @@ CREATE TABLE `property_category` (
   `agency_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `property_category`
+--
+
+INSERT INTO `property_category` (`category_id`, `category_name`, `reg_date`, `agency_id`) VALUES
+(1, 'Office Space', '2021-09-23 10:12:48', 21),
+(2, 'Apartments', '2021-09-23 10:12:48', 21);
+
 -- --------------------------------------------------------
 
 --
@@ -158,6 +181,14 @@ CREATE TABLE `property_location` (
   `reg_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `agency_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `property_location`
+--
+
+INSERT INTO `property_location` (`category_id`, `location_name`, `reg_date`, `agency_id`) VALUES
+(3, 'Westlands', '2021-09-23 10:28:27', 21),
+(4, 'Eastlands', '2021-09-23 10:28:27', 21);
 
 -- --------------------------------------------------------
 
@@ -299,19 +330,19 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `agency`
 --
 ALTER TABLE `agency`
-  MODIFY `agency_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `agency_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `agent`
 --
 ALTER TABLE `agent`
-  MODIFY `agent_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `agent_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `landlord`
 --
 ALTER TABLE `landlord`
-  MODIFY `lardlord_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `lardlord_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `property`
@@ -323,13 +354,13 @@ ALTER TABLE `property`
 -- AUTO_INCREMENT for table `property_category`
 --
 ALTER TABLE `property_category`
-  MODIFY `category_id` int(50) NOT NULL AUTO_INCREMENT;
+  MODIFY `category_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `property_location`
 --
 ALTER TABLE `property_location`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tenants`

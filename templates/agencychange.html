@@ -48,21 +48,32 @@
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
                     <br><br>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 justify-content-center">
-                            <h6><b>PERSONAL PROFILE</b></h6>
-                            <b>First Name:</b>{{row[1]}}<br><br>
-                              <b>Last Name:</b>{{row[2]}}<br><br>
-                              <b> Email:</b>{{row[3]}}<br><br>
-                                  <b>Tel:</b>{{row[7]}}<br><br>
+                             <b>{% with messages = get_flashed_messages(with_categories=true) %}
+   {% if messages %}
+      {% for category, message in messages %}
+                            <div class="alert alert-{{category}}" role="alert">
+                                 {{ message }}
+                            </div>
 
-                            <h6><b>ACCOUNT DETAILS</b></h6>
-                            <b>First Name:</b>{{row[5]}}<br><br>
-                            <b>First Name:</b>{{row[6]}}<br><br>
-                            <a href="/agencychange" class="btn btn-info">Change Password</a>
+      {% endfor %}
+   {% endif %}
+{% endwith %}</b><br>
+         <form class="user" action="/agencychange" method="POST" >
+                                        <div class="form-group">
+                                            <input type="password" name="currentpassword" class="form-control form-control-user"
+                                                id="exampleInputEmail" aria-describedby="emailHelp"
+                                                placeholder="Current Password" >
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                id="exampleInputPassword" placeholder="New Password" name="newpassword">
+                                        </div>
+                                    <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                 placeholder="Confirm Password" name="confirmpassword">
+                                        </div>
+             <input type="submit" value="Change Password" class="btn btn-info">
 
-                        </div>
-                    </div>
                     <br><br><br>
 
 

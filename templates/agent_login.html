@@ -22,7 +22,7 @@
 
 </head>
 
-<body class="bg-gradient-danger">
+<body class="bg-gradient-info">
 
     <div class="container">
 
@@ -51,7 +51,7 @@
       {% endfor %}
    {% endif %}
 {% endwith %}</b><br>
-                                    <form class="user" action="/agency_login" method="post">
+                                    <form class="user" action="/agent_login" method="post">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"
@@ -69,13 +69,13 @@
                                             </div>
                                         </div>
 
-                                        <center> <input type="submit" value="Login As Agency" class="btn btn-primary btn-user "></center>
+                                        <center> <input type="submit" value="Login As Agent" class="btn btn-primary btn-user "></center>
                                         <hr style="border:solid grey;">
                                        <center> <a href="/login" class="btn btn-google btn-user btn-">
                                             <i class=" fa-fw"></i> Login As Admin
                                         </a></center>
-                                         <center> <a href="/agent_login" class="btn btn-google btn-user btn-">
-                                            <i class=" fa-fw"></i> Login As Agent
+                                         <center> <a href="/agency_login    " class="btn btn-google btn-user btn-">
+                                            <i class=" fa-fw"></i> Login As Agency
                                         </a></center>
 
                                     </form>

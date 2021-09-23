@@ -10,6 +10,8 @@
                 <div class="sidebar-brand-text mx-3">ADMIN <sup>2</sup></div>
                   {% elif session.agency_id %}
                 <div class="sidebar-brand-text mx-3">AGENCY <sup>2</sup></div>
+                 {% elif session.agent_id %}
+                <div class="sidebar-brand-text mx-3">AGENT <sup>2</sup></div>
                 {% else %}
                 {% endif %}
             </a>
@@ -36,6 +38,10 @@
               <div class="sidebar-heading" style="color:white;">
                 Agency Action
             </div>
+            {% elif session.agent_id %}
+              <div class="sidebar-heading" style="color:white;">
+                Agent Action
+            </div>
               {% else %}
                 {% endif %}
 
@@ -55,6 +61,9 @@
                         <a class="collapse-item" href="cards.html">Monitor Agency</a>
                         {% elif session.agency_id %}
                         <a class="collapse-item" href="/addagent">Add Agent</a>
+                        {% elif session.agent_id %}
+                        <a class="collapse-item" href="/addtenant">Add Tenant</a>
+                         <a class="collapse-item" href="/addtenant">Add Landlord</a>
                         {% else %}
 
                         {% endif %}
@@ -83,6 +92,9 @@
                          <a class="collapse-item" href="">Tenants</a>
                         <a class="collapse-item" href="utilities-animation.html">Landloards</a>
                         <a class="collapse-item" href="/searchagent">Agents</a>
+                        {% elif session.agent_id %}
+                         <a class="collapse-item" href="">Tenants</a>
+                        <a class="collapse-item" href="utilities-animation.html">Landloards</a>
                         {% else %}
                         {% endif %}
                     </div>
