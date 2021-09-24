@@ -558,7 +558,7 @@ def saveproperty():
 
            cursor.execute(sql,(property_name,property_category,property_location,address,agent_id,landlord_id))
            con.commit()
-           flash('Saved Successfully')
+           flash('Property Saved Successfully')
            return redirect(url_for("addproperty", landlord_id = landlord_id))
 
 
@@ -700,6 +700,137 @@ def searchlandlord():
                 return render_template('searchlandlord.html', rows= rows)
     else:
         return redirect('/agent_login')
+
+
+@app.route('/searchproperty', methods = ['POST','GET'])
+def searchproperty():
+    if check_agent():
+        if request.method == 'POST':
+            property_name = request.form['property_name']
+            sql = 'select * from property where property_name = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (property_name))  # you get all rows from the latest
+            # check if no agency found
+            if cursor.rowcount == 0:
+                return render_template('searchproperty.html', msg='No Records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('searchproperty.html', rows=rows)
+
+        else:
+            sql = 'select * from property order by reg_date DESC '
+            cursor = conn().cursor()
+            cursor.execute(sql) #you get all rows from the latest
+            #check if no agency found
+            if cursor.rowcount == 0:
+                return render_template('searchproperty.html', msg = 'No Records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('searchproperty.html', rows= rows)
+    else:
+        return redirect('/agent_login')
+
+
+@app.route('/deletetenant/<tenant_id>')
+def deletetenant(tenant_id):
+    if check_agent():
+        sql = 'delete from tenants where tenant_id = %s'
+        cursor = con.cursor()
+        cursor.execute(sql,(tenant_id))
+        con.commit()
+        flash('Deleted successfully', 'info')
+        return redirect('/searchtenant')
+    else:
+       return  redirect('/agency_login')
+
+@app.route('/agentchange', methods = ['POST', 'GET'])
+def agentchange():
+    if check_agent():
+        if request.method == 'POST':
+            session_key = session['agent_id']
+            currentpassword = request.form['currentpassword']
+            newpassword = request.form['newpassword']
+            confirmpassword = request.form['confirmpassword']
+
+            sql = 'select * from agent where agent_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (session_key))
+            if cursor.rowcount==0:
+                return redirect('/logout')
+            else:
+                # fetchpassword..just one
+                row = cursor.fetchone()
+                hashed_password = row[4]
+                # verify the hashed and the password if they match
+                status = verify_password(hashed_password, currentpassword)
+                if status == True:
+                    # if new pass is not the same as confirm pass then they dont math and u render the template
+                    if newpassword !=confirmpassword:
+                        flash('The password dont match', 'danger')
+                        return render_template('agentchange.html')
+                    else:
+                        con = pymysql.connect(host='localhost', user='root', password='', database='property')
+                        sql = 'UPDATE agent SET password = %s where agent_id = %s'
+                        cursor = con.cursor()
+                        cursor.execute(sql,(hash_password(newpassword), session_key))
+                        con.commit()
+                        flash('Password Changed','info')
+                        return render_template('agentchange.html')
+
+                else:
+                    flash('current Password is not correct','danger')
+                    return render_template('agentchange.html')
+
+
+        else:
+            return render_template('agentchange.html')
+    else:
+       return redirect('/login')
+
+
+@app.route('/profileagent')
+def profileagent():
+    if check_agent():
+        sql = 'select * from agent where agent_id = %s'
+        cursor = conn().cursor()
+        session_key = session['agent_id']
+        cursor.execute(sql, (session_key))
+        row = cursor.fetchone()
+        return render_template('profileagent.html', row=row)
+    else:
+        return redirect('/login')
+
+@app.route('/edit_tenant/<tenant_id>', methods = ['POST', 'GET'])
+def edit_tenant(tenant_id):
+
+ if check_agent():
+        if request.method == "POST":
+            fname = request.form['fname']
+            lname = request.form['lname']
+            email = request.form['email']
+            tel_office = request.form['tel_office']
+            tel_personal = request.form['tel_personal']
+            company_name = request.form['company_name']
+            active = request.form['active']
+
+            cursor = con.cursor()
+            sql = 'update tenant set fname = %s, lname = %s, email = %s, tel_office = %s, tel_personal = %s, company_name= %s, active = %s where tenant_id= %s'
+            cursor.execute(sql, (fname, lname, email, tel_office, tel_personal, company_name, active, tenant_id))
+            con.commit()
+            flash('Update Successful' 'info')
+            return redirect('/searchtenant')
+        else:
+            sql = 'select * from tenants where tenant_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (tenant_id))
+            if cursor.rowcount == 0:
+                flash('Tenant does not exist', 'danger')
+                return redirect('/searchtenant')
+            else:
+                row = cursor.fetchone()
+                return render_template('edit_tenant.html', row =row)
+ else:
+       return  redirect('/agent_login')
 
 
 def check_admin():

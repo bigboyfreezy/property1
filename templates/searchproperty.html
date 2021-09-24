@@ -43,7 +43,7 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Tenants View Point</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Property</h1>
                         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
@@ -51,7 +51,7 @@
 
                  <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Tenant Details </h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Property Details </h6>
                         </div>
                       <b>{% with messages = get_flashed_messages(with_categories=true) %}
    {% if messages %}
@@ -94,13 +94,14 @@
                                             <td>{{row[9]}}</td>
                                           <td>{{row[10]}}</td>
                                             <td>
-                                            <a href="/deletetenant/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
-                                                <i class="fas fa-trash-alt " style="color:red;"><br>DELETE TENANT</i>
+                                            <a href="/deleteproperty/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
+                                                <i class="fas fa-trash-alt " style="color:red;"></i>
                                             </a>
                                             </td>
                                              <td>
-                                                 <a href="/edit_tenant/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
-                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT TENANT</i></a></td>
+                                                 <a href="/editproperty/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
+                                                 <i class="fas fa-user-edit" style="color:red;"></i></a></td>
+
                                         </tr>
                                 </tbody>
                                     {% endfor %}
