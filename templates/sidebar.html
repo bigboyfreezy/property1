@@ -64,7 +64,7 @@
                         {% elif session.agent_id %}
                         <a class="collapse-item" href="/addtenant">Add Tenant</a>
                          <a class="collapse-item" href="/addlandlord">Add Landlord</a>
-                        <a class="collapse-item" href="/addproperty">Add Property</a>
+
                         {% else %}
 
                         {% endif %}
@@ -94,8 +94,8 @@
                         <a class="collapse-item" href="utilities-animation.html">Landloards</a>
                         <a class="collapse-item" href="/searchagent">Agents</a>
                         {% elif session.agent_id %}
-                         <a class="collapse-item" href="">Tenants</a>
-                        <a class="collapse-item" href="utilities-animation.html">Landloards</a>
+                         <a class="collapse-item" href="/searchtenant">Tenants</a>
+                        <a class="collapse-item" href="/searchlandlord">Landloards</a>
                         {% else %}
                         {% endif %}
                     </div>

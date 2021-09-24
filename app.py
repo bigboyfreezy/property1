@@ -527,15 +527,31 @@ def agent_login():
             return render_template('agent_login.html')
 
 
-@app.route('/addproperty', methods = ['POST','GET'])
-def addproperty():
+@app.route('/addproperty/<landlord_id>', methods = ['POST','GET'])
+def addproperty(landlord_id):
+
+    sql1 = 'select * from property_category'
+    cursor1 = conn().cursor()
+    cursor1.execute(sql1)
+    categories = cursor1.fetchall()
+
+    # getting locations rows
+    sql2 = 'select * from property_location'
+    cursor2 = conn().cursor()
+    cursor2.execute(sql2)
+    locations = cursor2.fetchall()
+    return render_template('addproperty.html', categories=categories, locations = locations, landlord_id=landlord_id)
+
+@app.route('/saveproperty', methods = ['POST','GET'])
+def saveproperty():
     if request.method == 'POST':
            property_name = request.form['property_name']
            property_category = request.form['property_category']
            property_location = request.form['property_location']
            address = request.form['address']
-           agent_id = 'agent_id'
-           landlord_id = '1'
+           agent_id = session['agent_id']
+           landlord_id = request.form['landlord_id']
+
 
            cursor = con.cursor()
            sql = 'insert into property(property_name, category_id, property_location, address,agent_id,landlord_id) values(%s,%s,%s,%s,%s,%s)'
@@ -543,22 +559,11 @@ def addproperty():
            cursor.execute(sql,(property_name,property_category,property_location,address,agent_id,landlord_id))
            con.commit()
            flash('Saved Successfully')
-           return redirect('/addproperty')
+           return redirect(url_for("addproperty", landlord_id = landlord_id))
 
 
-    else:
-#         getting categories rows
-        sql1 = 'select * from property_category'
-        cursor1 = conn().cursor()
-        cursor1.execute(sql1)
-        categories = cursor1.fetchall()
 
-        # getting locations rows
-        sql2 = 'select * from property_location'
-        cursor2 = conn().cursor()
-        cursor2.execute(sql2)
-        locations = cursor2.fetchall()
-        return render_template('addproperty.html', categories = categories, locations = locations)
+
 
 @app.route('/addtenant' , methods = ['POST', 'GET'])
 def addtenant():
@@ -582,18 +587,18 @@ def addtenant():
                 return render_template('addtenant.html')
             else:
                 sql = "insert into tenants(fname, lname, email, password, tel_office , tel_personal , company_name,agent_id) values(%s,%s,%s,%s,%s,%s,%s,%s)"
-                try:
-                    cursor.execute(sql,(fname, lname, email, hash_password(password), tel_office,tel_personal, company_name,agent_id))
-                    con.commit()
+                # try:
+                cursor.execute(sql,(fname, lname, email, hash_password(password), tel_office,tel_personal, company_name,agent_id))
+                con.commit()
                     #send sms
-                    from sms import sending2
-                    sending2(tel_personal,password,fname,company_name)
+                from sms import sending2
+                sending2(tel_personal,password,fname,company_name)
 
-                    flash('Tenant Added Successfully', 'info')
-                    return render_template('addtenant.html')
-                except:
-                    flash('Tenant Add Fail', 'error')
-                    return render_template('addtenant.html' )
+                flash('Tenant Added Successfully', 'info')
+                return render_template('addtenant.html')
+                # except:
+                #     flash('Tenant Add Fail', 'error')
+                #     return render_template('addtenant.html' )
         else:
             return render_template('addtenant.html')
     else:
@@ -610,7 +615,7 @@ def addlandlord():
             tel_office = request.form['tel_office']
             tel_personal = request.form['tel_personal']
             company_name = request.form['company_name']
-            idno = request.form['idno']
+
             password = password_generator()
             agent_id = session['agent_id']
             cursor = con.cursor()
@@ -621,21 +626,78 @@ def addlandlord():
                 flash('Personal Phone Already in use', 'warning')
                 return render_template('addlandlord.html')
             else:
-                sql = "insert into landlord(fname, lname, email, password, tel_office , tel_personal , company_name,agent_id,idno) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-                try:
-                    cursor.execute(sql,(fname, lname, email, hash_password(password), tel_office,tel_personal, company_name,agent_id,idno))
-                    con.commit()
+                sql = "insert into landlord(fname, lname, email, password, tel_office , tel_personal , company_name,agent_id) values(%s,%s,%s,%s,%s,%s,%s,%s)"
+                #try:
+                cursor.execute(sql,(fname, lname, email, hash_password(password), tel_office,tel_personal, company_name,agent_id))
+                con.commit()
                     #send sms
-                    from sms import sending3
-                    sending3(tel_personal,password,fname,company_name)
+                from sms import sending3
+                sending3(tel_personal,password,fname,company_name)
 
-                    flash('Landlord Added Successfully', 'info')
-                    return render_template('addlandlord.html')
-                except:
-                    flash('Landlord Add Fail', 'error')
-                    return render_template('addlandlord.html' )
+                flash('Landlord Added Successfully', 'info')
+                return render_template('addlandlord.html')
+                #except:
+                    # flash('Landlord Add Fail', 'error')
+                    # return render_template('addlandlord.html' )
         else:
             return render_template('addlandlord.html')
+    else:
+        return redirect('/agent_login')
+
+
+@app.route('/searchtenant', methods = ['POST','GET'])
+def searchtenant():
+    if check_agent():
+        if request.method == 'POST':
+            email = request.form['email']
+            sql = 'select * from tenants where email = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (email))  # you get all rows from the latest
+            # check if no agency found
+            if cursor.rowcount == 0:
+                return render_template('searchtenant.html', msg='No Records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('searchtenant.html', rows=rows)
+
+        else:
+            sql = 'select * from tenants order by reg_date DESC'
+            cursor = conn().cursor()
+            cursor.execute(sql) #you get all rows from the latest
+            #check if no agency found
+            if cursor.rowcount == 0:
+                return render_template('searchtenant.html', msg = 'No Records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('searchtenant.html', rows= rows)
+    else:
+        return redirect('/agent_login')
+
+@app.route('/searchlandlord', methods = ['POST','GET'])
+def searchlandlord():
+    if check_agent():
+        if request.method == 'POST':
+            email = request.form['email']
+            sql = 'select * from landlord where email = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (email))  # you get all rows from the latest
+            # check if no agency found
+            if cursor.rowcount == 0:
+                return render_template('searchlandlord.html', msg='No Records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('searchlandlord.html', rows=rows)
+
+        else:
+            sql = 'select * from landlord order by reg_date DESC'
+            cursor = conn().cursor()
+            cursor.execute(sql) #you get all rows from the latest
+            #check if no agency found
+            if cursor.rowcount == 0:
+                return render_template('searchlandlord.html', msg = 'No Records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('searchlandlord.html', rows= rows)
     else:
         return redirect('/agent_login')
 
