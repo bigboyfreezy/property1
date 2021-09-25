@@ -814,7 +814,7 @@ def edit_tenant(tenant_id):
             active = request.form['active']
 
             cursor = con.cursor()
-            sql = 'update tenant set fname = %s, lname = %s, email = %s, tel_office = %s, tel_personal = %s, company_name= %s, active = %s where tenant_id= %s'
+            sql = 'update tenants set fname = %s, lname = %s, email = %s, tel_office = %s, tel_personal = %s, company_name= %s, active = %s where tenant_id= %s'
             cursor.execute(sql, (fname, lname, email, tel_office, tel_personal, company_name, active, tenant_id))
             con.commit()
             flash('Update Successful' 'info')
@@ -831,6 +831,53 @@ def edit_tenant(tenant_id):
                 return render_template('edit_tenant.html', row =row)
  else:
        return  redirect('/agent_login')
+
+
+@app.route('/editlandlord/<landlord_id>', methods = ['POST', 'GET'])
+def editlandlord(landlord_id):
+
+ if check_agent():
+        if request.method == "POST":
+            fname = request.form['fname']
+            lname = request.form['lname']
+            email = request.form['email']
+            tel_office = request.form['tel_office']
+            tel_personal = request.form['tel_personal']
+            company_name = request.form['company_name']
+            active = request.form['active']
+
+            cursor = con.cursor()
+            sql = 'update landlord set fname = %s, lname = %s, email = %s, tel_office = %s, tel_personal = %s, company_name= %s, active = %s where landlord_id= %s'
+            cursor.execute(sql, (fname, lname, email, tel_office, tel_personal, company_name, active, landlord_id))
+            con.commit()
+            flash('Update Successful' 'info')
+            return redirect('/searchlandlord')
+        else:
+            sql = 'select * from landlord where landlord_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (landlord_id))
+            if cursor.rowcount == 0:
+                flash('Landlord does not exist', 'danger')
+                return redirect('/searchlandlord')
+            else:
+                row = cursor.fetchone()
+                return render_template('editlandlord.html', row =row)
+ else:
+       return  redirect('/agent_login')
+
+
+@app.route('/deletelandlord/<landlord_id>')
+def deletelandlord(landlord_id):
+    if check_agent():
+        sql = 'delete from landlord where landlord_id = %s'
+        cursor = con.cursor()
+        cursor.execute(sql,(landlord_id))
+        con.commit()
+        flash('Deleted successfully', 'info')
+        return redirect('/searchlandlord')
+    else:
+       return  redirect('/agency_login')
+
 
 
 def check_admin():
