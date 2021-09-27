@@ -565,6 +565,8 @@ def saveproperty():
 
 
 
+
+
 @app.route('/addtenant' , methods = ['POST', 'GET'])
 def addtenant():
 
@@ -643,6 +645,55 @@ def addlandlord():
             return render_template('addlandlord.html')
     else:
         return redirect('/agent_login')
+
+@app.route('/savecategory' , methods = ['GET','POST'])
+def savecategory():
+    if request.method == 'POST':
+        category_name = request.form['category_name']
+        agency_id = session['agency_id']
+
+        cursor = con.cursor()
+        sql = 'insert into property_category(category_name, agency_id) values(%s,%s)'
+
+        cursor.execute(sql, (category_name, agency_id))
+        con.commit()
+        flash('Category Saved Successfully', 'info')
+        return render_template("savecategory.html")
+    else:
+        return render_template('savecategory.html')
+
+@app.route('/savetype' , methods = ['GET','POST'])
+def savetype():
+    if request.method == 'POST':
+        type_name = request.form['type_name']
+        agency_id = session['agency_id']
+
+        cursor = con.cursor()
+        sql = 'insert into unit_type(type_name, agency_id) values(%s,%s)'
+
+        cursor.execute(sql, (type_name, agency_id))
+        con.commit()
+        flash('Type Saved Successfully', 'info')
+        return render_template("savecategory.html")
+    else:
+        return render_template('savecategory.html')
+
+
+@app.route('/savelocation' , methods = ['GET','POST'])
+def savelocation():
+    if request.method == 'POST':
+        location_name = request.form['location_name']
+        agency_id = session['agency_id']
+
+        cursor = con.cursor()
+        sql = 'insert into property_location(location_name, agency_id) values(%s,%s)'
+
+        cursor.execute(sql, (location_name, agency_id))
+        con.commit()
+        flash('Location Saved Successfully', 'info')
+        return render_template("savecategory.html")
+    else:
+        return render_template('savecategory.html')
 
 
 @app.route('/searchtenant', methods = ['POST','GET'])
@@ -869,7 +920,7 @@ def editlandlord(landlord_id):
 @app.route('/deletelandlord/<landlord_id>')
 def deletelandlord(landlord_id):
     if check_agent():
-        sql = 'delete from landlord where landlord_id = %s'
+        sql = 'delete from landlord where lardlord_id = %s'
         cursor = con.cursor()
         cursor.execute(sql,(landlord_id))
         con.commit()

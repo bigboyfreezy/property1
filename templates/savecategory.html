@@ -57,40 +57,49 @@
 
       {% endfor %}
    {% endif %}
-{% endwith %}</b><br>
-         <form class="user" action="/addlandlord" method="POST" class="justify_content_center" >
+{% endwith %}</b><br> <center>     <u> <h6 class="h4 mb-0 text-gray-800">Property Category Addition</h6></u></center>
+                    <br>
+         <form class="user" action="/savecategory" method="POST" class="justify_content_center" >
                                         <div class="form-group">
-                                            <input type="text" name="fname" class="form-control form-control-user"
+                                            <input type="text" name="category_name" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"
-                                                placeholder="Fist name" >
+                                                placeholder="Category Name" >
                                         </div>
+
+
+            <center> <input type="submit" value="Add Category" class="btn btn-warning"></center>
+
+             <br><br><br></form>
+             <hr style="border:solid;">
+                    <br>
+               <center>     <u> <h6 class="h4 mb-0 text-gray-800">Unit Type Addition</h6></u></center>
+                    <br>
+                    <form class="user" action="/savetype" method="POST" class="justify_content_center" >
                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Last Name" name="lname">
-                                        </div>
-                                    <div class="form-group">
-                                            <input type="email" class="form-control form-control-user"
-                                                 placeholder="Email" name="email">
-                                        </div>
-
-                                       <div class="form-group">
-                                            <input type="text" class="form-control form-control-user"
-                                                 placeholder="Office Telephone" name="tel_office">
-                                        </div>
-                                      <div class="form-group">
-                                            <input type="text" class="form-control form-control-user"
-                                                 placeholder="Personal Telephone" name="tel_personal">
-                                        </div>
-                                         <div class="form-group">
-                                            <input type="text" class="form-control form-control-user"
-                                                 placeholder="Company Name" name="company_name">
+                                            <input type="text" name="type_name" class="form-control form-control-user"
+                                                aria-describedby="emailHelp"
+                                                placeholder="Type Name" >
                                         </div>
 
 
+            <center> <input type="submit" value="Add Type" class="btn btn-warning"></center>
 
-             <input type="submit" value="Add Landlord" class="btn btn-warning">
+             <br><br><br></form>
+             <hr style="border:solid;">
+                    <br><center>     <u> <h6 class="h4 mb-0 text-gray-800">Location Addition</h6></u></center>
+                    <br>
+                    <form class="user" action="/savelocation" method="POST" class="justify_content_center" >
+                                        <div class="form-group">
+                                            <input type="text" name="location_name" class="form-control form-control-user"
+                                                aria-describedby="emailHelp"
+                                                placeholder="Location Name" >
+                                        </div>
 
-                    <br><br><br>
+
+            <center> <input type="submit" value="Add Location" class="btn btn-warning"></center>
+
+             <br><br><br></form>
+             <hr style="border:solid;">
 
 
             <!-- Footer -->
