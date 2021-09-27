@@ -558,7 +558,7 @@ def saveproperty():
 
            cursor.execute(sql,(property_name,property_category,property_location,address,agent_id,landlord_id))
            con.commit()
-           flash('Property Saved Successfully')
+           flash('Property Saved Successfully','info')
            return redirect(url_for("addproperty", landlord_id = landlord_id))
 
 
@@ -853,7 +853,7 @@ def editlandlord(landlord_id):
             flash('Update Successful' 'info')
             return redirect('/searchlandlord')
         else:
-            sql = 'select * from landlord where landlord_id = %s'
+            sql = 'select * from landlord where lardlord_id = %s'
             cursor = conn().cursor()
             cursor.execute(sql, (landlord_id))
             if cursor.rowcount == 0:
@@ -877,6 +877,51 @@ def deletelandlord(landlord_id):
         return redirect('/searchlandlord')
     else:
        return  redirect('/agency_login')
+
+@app.route('/landlord_property/<landlord_id>')
+def landlord_property(landlord_id):
+    sql = 'select * from property where landlord_id = %s'
+    cursor = conn().cursor()
+    cursor.execute(sql, (landlord_id))
+    #check if agency i
+    if cursor.rowcount == 0:
+        return render_template('landlord_property.html', msg='No records')
+    else:
+        rows = cursor.fetchall()
+        return render_template('landlord_property.html', rows=rows)
+
+@app.route('/addunit/<property_id>')
+def addunit(property_id):
+
+    sql = 'select * from unit_type'
+    cursor = conn().cursor()
+    cursor.execute(sql)#you get all rows from the latest
+    #check if unit type is found
+    if cursor.rowcount == 0:
+        return render_template('addunit.html', msg= 'no records')
+    else:
+        rows = cursor.fetchall()
+        return render_template('addunit.html', rows=rows, property_id = property_id)
+
+@app.route('/saveunit', methods = ['POST','GET'])
+def saveunit():
+    if request.method == 'POST':
+           unit_code = request.form['unit_code']
+           type_id = request.form['type_id']
+           property_id = request.form['property_id']
+
+           agent_id = session['agent_id']
+
+
+
+           cursor = con.cursor()
+           sql = 'insert into unit(unit_code, agent_id, type_id, property_id) values(%s,%s,%s,%s)'
+
+           cursor.execute(sql,(unit_code,agent_id,type_id,property_id))
+           con.commit()
+           flash('Unit Saved Successfully','info')
+           return redirect(url_for("addunit", property_id = property_id))
+
 
 
 

@@ -43,15 +43,15 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Landlord View Point</h1>
-                        <a href="/addlandlord" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-plus fa-sm text-white-50"></i> Add Landlord</a>
+                        <h1 class="h3 mb-0 text-gray-800">PropertyDetails</h1>
+                        <a href="/searchlandlord" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-eye "></i> View Landlords</a>
                     </div>
                     <br><br>
 
                  <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Landlord Details </h6>
+                            <h6 class="m-0 font-weight-bold text-primary">PROPERTY Details </h6>
                         </div>
                       <b>{% with messages = get_flashed_messages(with_categories=true) %}
    {% if messages %}
@@ -71,12 +71,11 @@
 
                                     <thead>
                                         <tr>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Email</th>
-                                            <th>Active</th>
-                                            <th>Phone</th>
-                                            <th>Company Name</th>
+                                            <th>Property Name</th>
+                                            <th>Address</th>
+                                            <th>Category</th>
+                                            <th>Location</th>
+
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -88,29 +87,25 @@
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
-                                           <td>{{row[2]}}</td>
-                                            <td>{{row[3]}}</td>
-                                           <td>{{row[5]}}</td>
-                                            <td>{{row[9]}}</td>
-                                          <td>{{row[10]}}</td>
+                                           <td>{{row[6]}}</td>
+                                            <td>{{row[4]}}</td>
+                                            <td>{{row[7]}}</td>
+
                                             <td>
-                                            <a href="/deletelandlord/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
-                                                <i class="fas fa-trash-alt " style="color:red;"><br>DELETE LANDLORD</i>
+                                            <a href="/deleteproperty/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
+                                                <i class="fas fa-trash-alt " style="color:red;"><br>DELETE PROPERTY</i>
                                             </a>
                                             </td>
                                              <td>
-                                                 <a href="/editlandlord/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
-                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT LANDLORD</i></a></td>
+                                                 <a href="/editproperty/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
+                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT PROPERTY</i></a></td>
 
                                             <td>
-                                                 <a href="/addproperty/{{row[0]}}" >
-                                                 <i class="fas fa-plus-square" style="color:red;"><br>ADD PROPERTY</i></a>
+                                                 <a href="/addunit/{{row[0]}}" >
+                                                 <i class="fas fa-plus-square" style="color:red;"><br>ADD UNIT</i></a>
                                             </td>
 
-                                            <td>
-                                                 <a href="/landlord_property/{{row[0]}}" >
-                                                <i class="fas fa-eye" style="color:red;"><br>VIEW PROPERTY</i></a>
-                                            </td>
+
                                         </tr>
                                 </tbody>
                                     {% endfor %}
