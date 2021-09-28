@@ -919,6 +919,53 @@ def editlandlord(landlord_id):
        return  redirect('/agent_login')
 
 
+
+
+@app.route('/editunit/<unit_id>', methods = ['POST', 'GET'])
+def editunit(unit_id):
+
+ if check_agent():
+        if request.method == "POST":
+            unit_code = request.form['unit_code']
+
+
+
+            agent_id = session['agent_id']
+
+
+            cursor = con.cursor()
+            sql = 'update landlord set unit_code = %s, type_id= %s where unit_id= %s'
+            cursor.execute(sql, (unit_code, unit_id))
+            con.commit()
+            flash('Update Successful' 'info')
+            return redirect('/viewunit')
+        else:
+            sql = 'select * from unit where unit_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (unit_id))
+            if cursor.rowcount == 0:
+                flash('Landlord does not exist', 'danger')
+                return redirect('/viewunit')
+            else:
+                row = cursor.fetchone()
+                return render_template('editunit.html', row =row)
+ else:
+       return  redirect('/agent_login')
+
+@app.route('/deleteunit/<property_id>')
+def deleteunit(property_id):
+    if check_agent():
+        sql = 'delete from unit where unit_id = %s'
+        cursor = con.cursor()
+        cursor.execute(sql,(property_id))
+        con.commit()
+        flash('Deleted successfully', 'info')
+        return redirect('/viewunit')
+    else:
+       return  redirect('/agency_login')
+
+
+
 @app.route('/deletelandlord/<landlord_id>')
 def deletelandlord(landlord_id):
     if check_agent():
