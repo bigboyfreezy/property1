@@ -488,6 +488,55 @@ def agencychange():
        return redirect('/login')
 
 
+@app.route('/savecategory' , methods = ['GET','POST'])
+def savecategory():
+    if request.method == 'POST':
+        category_name = request.form['category_name']
+        agency_id = session['agency_id']
+
+        cursor = con.cursor()
+        sql = 'insert into property_category(category_name, agency_id) values(%s,%s)'
+
+        cursor.execute(sql, (category_name, agency_id))
+        con.commit()
+        flash('Category Saved Successfully', 'info')
+        return render_template("savecategory.html")
+    else:
+        return render_template('savecategory.html')
+
+@app.route('/savetype' , methods = ['GET','POST'])
+def savetype():
+    if request.method == 'POST':
+        type_name = request.form['type_name']
+        agency_id = session['agency_id']
+
+        cursor = con.cursor()
+        sql = 'insert into unit_type(type_name, agency_id) values(%s,%s)'
+
+        cursor.execute(sql, (type_name, agency_id))
+        con.commit()
+        flash('Type Saved Successfully', 'info')
+        return render_template("savecategory.html")
+    else:
+        return render_template('savecategory.html')
+
+
+@app.route('/savelocation' , methods = ['GET','POST'])
+def savelocation():
+    if request.method == 'POST':
+        location_name = request.form['location_name']
+        agency_id = session['agency_id']
+
+        cursor = con.cursor()
+        sql = 'insert into property_location(location_name, agency_id) values(%s,%s)'
+
+        cursor.execute(sql, (location_name, agency_id))
+        con.commit()
+        flash('Location Saved Successfully', 'info')
+        return render_template("savecategory.html")
+    else:
+        return render_template('savecategory.html')
+
 # ================= Agent routes =========================
 
 @app.route('/agent_login', methods = ['GET','POST'])
@@ -646,59 +695,12 @@ def addlandlord():
     else:
         return redirect('/agent_login')
 
-@app.route('/savecategory' , methods = ['GET','POST'])
-def savecategory():
-    if request.method == 'POST':
-        category_name = request.form['category_name']
-        agency_id = session['agency_id']
 
-        cursor = con.cursor()
-        sql = 'insert into property_category(category_name, agency_id) values(%s,%s)'
-
-        cursor.execute(sql, (category_name, agency_id))
-        con.commit()
-        flash('Category Saved Successfully', 'info')
-        return render_template("savecategory.html")
-    else:
-        return render_template('savecategory.html')
-
-@app.route('/savetype' , methods = ['GET','POST'])
-def savetype():
-    if request.method == 'POST':
-        type_name = request.form['type_name']
-        agency_id = session['agency_id']
-
-        cursor = con.cursor()
-        sql = 'insert into unit_type(type_name, agency_id) values(%s,%s)'
-
-        cursor.execute(sql, (type_name, agency_id))
-        con.commit()
-        flash('Type Saved Successfully', 'info')
-        return render_template("savecategory.html")
-    else:
-        return render_template('savecategory.html')
-
-
-@app.route('/savelocation' , methods = ['GET','POST'])
-def savelocation():
-    if request.method == 'POST':
-        location_name = request.form['location_name']
-        agency_id = session['agency_id']
-
-        cursor = con.cursor()
-        sql = 'insert into property_location(location_name, agency_id) values(%s,%s)'
-
-        cursor.execute(sql, (location_name, agency_id))
-        con.commit()
-        flash('Location Saved Successfully', 'info')
-        return render_template("savecategory.html")
-    else:
-        return render_template('savecategory.html')
 
 
 @app.route('/searchtenant', methods = ['POST','GET'])
 def searchtenant():
-    if check_agent():
+    if check_admin_agency_agent():
         if request.method == 'POST':
             email = request.form['email']
             sql = 'select * from tenants where email = %s'
@@ -920,7 +922,7 @@ def editlandlord(landlord_id):
 @app.route('/deletelandlord/<landlord_id>')
 def deletelandlord(landlord_id):
     if check_agent():
-        sql = 'delete from landlord where lardlord_id = %s'
+        sql = 'delete from landlord where landlord_id = %s'
         cursor = con.cursor()
         cursor.execute(sql,(landlord_id))
         con.commit()
@@ -929,17 +931,50 @@ def deletelandlord(landlord_id):
     else:
        return  redirect('/agency_login')
 
+@app.route('/viewunit/<property_id>')
+def viewunit(property_id):
+    if check_agent():
+        sql = 'select * from unit where property_id = %s'
+        cursor = conn().cursor()
+        cursor.execute(sql, (property_id))
+
+
+        sql1 = 'select * from unit_type'
+        cursor0 = conn().cursor()
+        cursor0.execute(sql1)
+        types = cursor0.fetchall()
+
+        if cursor.rowcount == 0:
+            return render_template('viewunit.html', msg='No records')
+        else:
+            rows = cursor.fetchall()
+            return render_template('viewunit.html', rows=rows, property_id=property_id, types=types)
+
+
 @app.route('/landlord_property/<landlord_id>')
 def landlord_property(landlord_id):
     sql = 'select * from property where landlord_id = %s'
     cursor = conn().cursor()
     cursor.execute(sql, (landlord_id))
     #check if agency i
+    sql1 = 'select * from property_category'
+    cursor0 = conn().cursor()
+    cursor0.execute(sql1)
+    categories = cursor0.fetchall()
+    #fetching location
+    sql2 = 'select * from property_location'
+    cursor1 = conn().cursor()
+    cursor1.execute(sql2)
+    locations = cursor1.fetchall()
+
+
+
+
     if cursor.rowcount == 0:
         return render_template('landlord_property.html', msg='No records')
     else:
         rows = cursor.fetchall()
-        return render_template('landlord_property.html', rows=rows)
+        return render_template('landlord_property.html', rows=rows, categories=categories, locations=locations)
 
 @app.route('/addunit/<property_id>')
 def addunit(property_id):

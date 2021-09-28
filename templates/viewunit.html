@@ -71,10 +71,9 @@
 
                                     <thead>
                                         <tr>
-                                            <th>Property Name</th>
-                                            <th>Address</th>
-                                            <th>Category</th>
-                                            <th>Location</th>
+                                            <th>Code Name</th>
+                                            <th>Unit Type</th>
+
 
                                         </tr>
                                     </thead>
@@ -87,41 +86,29 @@
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
-                                           <td>{{row[6]}}</td>
+                                           <td>{{row[4]}}</td>
                                             <td>
-                                                {% for category in categories %}
-                                                {% if row[4] == category[0] %}
-                                                  {{category[1]}}
+                                                {% for type in types %}
+                                                {% if row[4] == type[0] %}
+                                                  {{type[1]}}
                                                 {% endif %}
                                                 {% endfor %}
 
 
                                             </td>
-                                            <td>  {% for location in locations %}
-                                                {% if row[7] == location[0] %}
-                                                  {{location[1]}}
-                                                {% endif %}
-                                                {% endfor %}
-                                            </td>
+
 
                                             <td>
-                                            <a href="/deleteproperty/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
-                                                <i class="fas fa-trash-alt " style="color:red;"><br>DELETE PROPERTY</i>
+                                            <a href="/deleteunit/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
+                                                <i class="fas fa-trash-alt " style="color:red;"><br>DELETE UNIT</i>
                                             </a>
                                             </td>
                                              <td>
-                                                 <a href="/editproperty/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
-                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT PROPERTY</i></a></td>
+                                                 <a href="/editunit/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
+                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT UNIT</i></a></td>
 
-                                            <td>
-                                                 <a href="/addunit/{{row[0]}}" >
-                                                 <i class="fas fa-plus-square" style="color:red;"><br>ADD UNIT</i></a>
-                                            </td>
 
-                                              <td>
-                                                 <a href="/viewunit/{{row[0]}}" >
-                                                 <i class="fas fa-eye" style="color:red;"><br>VIEW UNIT</i></a>
-                                            </td>
+
 
                                         </tr>
                                 </tbody>
