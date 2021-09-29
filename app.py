@@ -991,11 +991,66 @@ def viewunit(property_id):
         cursor0.execute(sql1)
         types = cursor0.fetchall()
 
+        sql2 = 'select * from property_location'
+        cursor1 = conn().cursor()
+        cursor1.execute(sql2)
+        locations = cursor1.fetchall()
+
+
+
         if cursor.rowcount == 0:
             return render_template('viewunit.html', msg='No records')
         else:
             rows = cursor.fetchall()
-            return render_template('viewunit.html', rows=rows, property_id=property_id, types=types)
+            return render_template('viewunit.html', rows=rows, property_id=property_id, locations=locations, types=types)
+
+
+@app.route('/allocateunit', methods = ['POST','GET'])
+def allocateunit():
+    if check_agent():
+        if request.method == 'POST':
+            min = float(request.form['min'])
+            max = float(request.form['max'])
+            location_name = request.form['location_name']
+            sql = 'select * from unit where cost between %s AND %s or location_name = %s '
+            cursor = conn().cursor()
+            cursor.execute(sql, (min,max,location_name))
+
+
+            sql1 = 'select * from property_location '
+            cursor1 = conn().cursor()
+            cursor1.execute(sql1)
+            locations = cursor1.fetchall()
+
+            if cursor.rowcount == 0:
+                flash('No units Found','info')
+                return redirect('allocateunit.html')
+            else:
+                rows = cursor.fetchall()
+                return render_template('allocateunit.html', rows=rows , locations=locations )
+        else:
+            sql = 'select * from unit '
+            cursor = conn().cursor()
+            cursor.execute(sql, )
+
+            sql1 = 'select * from property_location '
+            cursor1 = conn().cursor()
+            cursor1.execute(sql1 )
+            locations = cursor1.fetchall()
+
+
+
+
+
+            if cursor.rowcount == 0:
+                return redirect('allocateunit.html', msg='No records')
+            else:
+                rows = cursor.fetchall()
+                return render_template('allocateunit.html', rows=rows, locations=locations)
+
+    else:
+        return redirect('/agent_login')
+
 
 
 @app.route('/landlord_property/<landlord_id>')
@@ -1030,11 +1085,28 @@ def addunit(property_id):
     cursor = conn().cursor()
     cursor.execute(sql)#you get all rows from the latest
     #check if unit type is found
+
+    sql1 = 'select * from property where property_id = %s'
+    cursor1 = conn().cursor()
+    cursor1.execute(sql1, (property_id))
+    row = cursor1.fetchone()
+
+
+
+    sql2 = 'select * from property_location where category_id = %s'
+    cursor2 = conn().cursor()
+    cursor2.execute(sql2,(row[7]))
+    locations = cursor2.fetchone()
+    location_name = locations[1]
+
+
+
+
     if cursor.rowcount == 0:
         return render_template('addunit.html', msg= 'no records')
     else:
         rows = cursor.fetchall()
-        return render_template('addunit.html', rows=rows, property_id = property_id)
+        return render_template('addunit.html', rows=rows, property_id = property_id, location_name = location_name)
 
 @app.route('/saveunit', methods = ['POST','GET'])
 def saveunit():
@@ -1042,15 +1114,18 @@ def saveunit():
            unit_code = request.form['unit_code']
            type_id = request.form['type_id']
            property_id = request.form['property_id']
+           location_name= request.form['location_name']
+           description= request.form['description']
+           cost = request.form['cost']
 
            agent_id = session['agent_id']
 
 
 
            cursor = con.cursor()
-           sql = 'insert into unit(unit_code, agent_id, type_id, property_id) values(%s,%s,%s,%s)'
+           sql = 'insert into unit(unit_code, agent_id, type_id, property_id,location_name,description,cost) values(%s,%s,%s,%s,%s,%s,%s)'
 
-           cursor.execute(sql,(unit_code,agent_id,type_id,property_id))
+           cursor.execute(sql,(unit_code,agent_id,type_id,property_id,location_name,description,cost))
            con.commit()
            flash('Unit Saved Successfully','info')
            return redirect(url_for("addunit", property_id = property_id))

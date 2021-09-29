@@ -49,23 +49,43 @@
                     </div>
                     <br><br>
 
+
                  <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">PROPERTY Details </h6>
                         </div>
-                      <b>{% with messages = get_flashed_messages(with_categories=true) %}
-   {% if messages %}
-      {% for category, message in messages %}
-                            <div class="alert alert-{{category}}" role="alert">
-                                 {{ message }}
-                            </div>
+                      <b>
+                      </b><br>
 
-      {% endfor %}
-   {% endif %}
-{% endwith %}</b><br>
+
 
                         <div class="card-body">
                             <div class="table-responsive">
+                                <br>
+                                {% with messages = get_flashed_messages(with_categories=true) %}
+                                   {% if messages %}
+                                      {% for category, message in messages %}
+                                      <div class="alert alert-{{category}}" role="alert">
+                                           {{ message }}
+                                      </div>
+                                      {% endfor %}
+                                   {% endif %}
+                                {% endwith %}
+
+                              <form action="/allocateunit" method="post" class="form-inline">
+                                <input type="number" name="min" placeholder="Enter Min Cost" class="form-control">
+                                <input type="number" name="max" placeholder="Enter Max Cost" class="form-control">
+                                   <select name="location_name" id="" class="form-control">
+                                     <option value="0">No location</option>
+                                 {% for location in locations %}
+                                 <option value="{{location[1]}}">{{location[1]}}</option>
+                                 {% endfor %}
+                                     </select>
+                                    <input type="submit" class="btn btn-gradient-info" value="search">
+
+
+                                </form>
+
                                 {% if rows %}
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
@@ -73,51 +93,23 @@
                                         <tr>
                                             <th>Code Name</th>
                                             <th>Unit Type</th>
+                                            <th>Location</th>
+                                            <th>Cost</th>
 
 
                                         </tr>
                                     </thead>
-                                    <tfoot>
+
                                     {% for row in rows %}
-
-
-
 
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
-                                           <td>{{row[4]}}</td>
-                                            <td>
-                                                {% for type in types %}
-                                                {% if row[4] == type[0] %}
-                                                  {{type[1]}}
-                                                {% endif %}
-                                                {% endfor %}
+                                            <td>{{row[4]}}</td>
+                                            <td>{{row[6]}}</td>
 
 
-                                            </td>
-                                             <td>
-                                                {% for location in locations %}
-                                                {% if row[4] == location[0] %}
-                                                  {{location[1]}}
-                                                {% endif %}
-                                                {% endfor %}
-
-
-                                            </td>
-
-
-                                            <td>
-                                            <a href="/deleteunit/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
-                                                <i class="fas fa-trash-alt " style="color:red;"><br>DELETE UNIT</i>
-                                            </a>
-                                            </td>
-                                             <td>
-                                                 <a href="/editunit/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
-                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT UNIT</i></a></td>
-
-
-
+                                          <td>{{row[7]}}</td>
 
                                         </tr>
                                 </tbody>

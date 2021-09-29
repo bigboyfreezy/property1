@@ -60,6 +60,7 @@
 {% endwith %}</b><br>
          <form class="user" action="/saveunit" method="POST" class="justify_content_center" >
              <input type="hidden" name="property_id" value="{{property_id}}">
+             <input type="hidden" name="location_name" value="{{location_name}}">
                                         <div class="form-group">
                                             <input type="text" name="unit_code" class="form-control form-control-user"
                                                 id="exampleInputEmail" aria-describedby="emailHelp"
@@ -73,6 +74,12 @@
              <option value="{{row[0]}}">{{row[1]}}</option>
              {% endfor %}
                  </select><br>
+
+                 <label for="">Describe The Unit</label><br>
+                 <textarea name="description" id="" cols="30" rows="5" class="form-control"></textarea>
+                 <br>
+                 <label for="">Cost</label>
+                 <input type="number" name="cost" placeholder="Unit Cost" class="form-control" >
                  </div>
 
 
