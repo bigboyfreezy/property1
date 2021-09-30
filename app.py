@@ -1012,9 +1012,10 @@ def allocateunit():
             min = float(request.form['min'])
             max = float(request.form['max'])
             location_name = request.form['location_name']
-            sql = 'select * from unit where cost between %s AND %s or location_name = %s '
+            type_id = request.form['type_id']
+            sql = 'select * from unit where cost between %s AND %s or location_name = %s or type_id = %s'
             cursor = conn().cursor()
-            cursor.execute(sql, (min,max,location_name))
+            cursor.execute(sql, (min,max,location_name,type_id))
 
 
             sql1 = 'select * from property_location '
@@ -1022,12 +1023,17 @@ def allocateunit():
             cursor1.execute(sql1)
             locations = cursor1.fetchall()
 
+            sql2 = 'select * from unit_type '
+            cursor2 = conn().cursor()
+            cursor2.execute(sql2)
+            types = cursor2.fetchall()
+
             if cursor.rowcount == 0:
                 flash('No units Found','info')
                 return redirect('allocateunit.html')
             else:
                 rows = cursor.fetchall()
-                return render_template('allocateunit.html', rows=rows , locations=locations )
+                return render_template('allocateunit.html', rows=rows , locations=locations , types=types)
         else:
             sql = 'select * from unit '
             cursor = conn().cursor()
@@ -1038,15 +1044,16 @@ def allocateunit():
             cursor1.execute(sql1 )
             locations = cursor1.fetchall()
 
-
-
-
+            sql2 = 'select * from unit_type '
+            cursor2 = conn().cursor()
+            cursor2.execute(sql2)
+            types = cursor2.fetchall()
 
             if cursor.rowcount == 0:
-                return redirect('allocateunit.html', msg='No records')
+                return render_template('allocateunit.html',)
             else:
                 rows = cursor.fetchall()
-                return render_template('allocateunit.html', rows=rows, locations=locations)
+                return render_template('allocateunit.html', rows=rows, locations=locations, types=types)
 
     else:
         return redirect('/agent_login')

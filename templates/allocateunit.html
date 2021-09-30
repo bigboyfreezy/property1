@@ -81,6 +81,13 @@
                                  <option value="{{location[1]}}">{{location[1]}}</option>
                                  {% endfor %}
                                      </select>
+
+                                   <select name="type_id" id="" class="form-control">
+
+                                 {% for type in types %}
+                                 <option value="{{type[0]}}">{{type[1]}}</option>
+                                 {% endfor %}
+                                     </select>
                                     <input type="submit" class="btn btn-gradient-info" value="search">
 
 
