@@ -58,7 +58,7 @@
                       </b><br>
 
 
-
+<b>{{unit_id}}</b>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <br>
@@ -72,53 +72,58 @@
                                    {% endif %}
                                 {% endwith %}
 
-                              <form action="/allocateunit" method="post" class="form-inline">
-                                <input type="number" name="min" placeholder="Enter Min Cost" class="form-control">
-                                <input type="number" name="max" placeholder="Enter Max Cost" class="form-control">
-                                   <select name="location_name" id="" class="form-control">
-                                     <option value="0">No location</option>
-                                 {% for location in locations %}
-                                 <option value="{{location[1]}}">{{location[1]}}</option>
-                                 {% endfor %}
-                                     </select>
-                                    <input type="submit" class="btn btn-gradient-info" value="search">
+                              <form action="/tenantallocate/{{unit_id}}" method="post" class="form-inline">
+                                <input type="email" name="email" placeholder="Enter Email" class="form-control">
+
+                                    <input type="submit" class="btn btn-info" value="search">
 
 
                                 </form>
 
-                                {% if rows %}
+                                {% if row %}
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
                                     <thead>
                                         <tr>
-                                            <th>Code Name</th>
-                                            <th>Unit Type</th>
-                                            <th>Location</th>
-                                            <th>Cost</th>
+                                            <th>Tenant First Name</th>
+                                            <th>Tenant Last Name</th>
+
 
 
                                         </tr>
                                     </thead>
 
-                                    {% for row in rows %}
+
 
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
-                                            <td>{{row[4]}}</td>
-                                            <td>{{row[6]}}</td>
-
-
-                                          <td>{{row[7]}}</td>
-                                             <td> <a href="/tenantallocate/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
+                                            <td>{{row[2]}}</td>
+                                            <td> <a href="/tenantallocate/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
                                                 <i class="fas fa-plus-square " style="color:red;"><br>ALLOCATE TO TENANT</i>
                                             </a></td>
 
+
+
+
+
+
+
                                         </tr>
                                 </tbody>
-                                      <br>
-                                    {% endfor %}
+
                                 </table>
+
+                                <form action="/commitallocation" method="post">
+                                    <input type="hidden" name="unit_id" value="{{unit_id}}">
+                                    <input type="hidden" name="tenant_id" value="{{row[0]}}">
+                                    <input type="submit" value="Allocate" class="btn btn-danger">
+
+
+                                </form>
+
+
+
                                 {% else %}
                                  <b style="color:red;">{{msg}}</b>
                                 {% endif %}

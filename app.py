@@ -1130,6 +1130,35 @@ def saveunit():
            flash('Unit Saved Successfully','info')
            return redirect(url_for("addunit", property_id = property_id))
 
+@app.route('/tenantallocate/<unit_id>', methods = ['POST','GET'])
+def tenantallocate(unit_id):
+    if request.method == 'POST':
+        email = request.form['email']
+        cursor = conn().cursor()
+        sql = 'select * from tenants where email = %s'
+        cursor.execute(sql,(email))
+        if cursor.rowcount == 0:
+            return render_template('tenantallocate.html',msg='Tenant Not Found',unit_id=unit_id)
+        else:
+            row = cursor.fetchone()
+            return render_template('tenantallocate.html', row= row, unit_id=unit_id)
+    else:
+        return render_template('tenantallocate.html', unit_id=unit_id)
+
+@app.route('/commitallocation',methods = ['POST','GET'])
+def commitallocation():
+    if request.method == 'POST':
+        unit_id = request.form['unit_id']
+        tenant_id = request.form['tenant_id']
+        cursor = con.cursor()
+        sql = 'insert into allocate_unit(unit_id, tenant_id) values (%s,%s)'
+
+        cursor.execute(sql,(unit_id,tenant_id))
+        con.commit()
+
+        flash('Allocation Successful', 'info')
+        return redirect(url_for('tenantallocate', unit_id=unit_id))
+
 
 
 
