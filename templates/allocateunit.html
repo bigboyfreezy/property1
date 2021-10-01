@@ -83,14 +83,15 @@
                                      </select>
 
                                    <select name="type_id" id="" class="form-control">
+                                        <option value="0">No Type</option>
 
                                  {% for type in types %}
                                  <option value="{{type[0]}}">{{type[1]}}</option>
                                  {% endfor %}
                                      </select>
-                                    <input type="submit" class="btn btn-gradient-info" value="search">
 
 
+                                  <br><input type="submit" class="btn btn-info justify-content-center" value="search">
                                 </form>
 
                                 {% if rows %}

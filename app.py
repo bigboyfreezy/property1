@@ -960,7 +960,7 @@ def deleteunit(property_id):
         cursor.execute(sql,(property_id))
         con.commit()
         flash('Deleted successfully', 'info')
-        return redirect('/viewunit')
+        return redirect(url_for('viewunit', property_id=property_id))
     else:
        return  redirect('/agency_login')
 
@@ -1008,15 +1008,14 @@ def viewunit(property_id):
 @app.route('/allocateunit', methods = ['POST','GET'])
 def allocateunit():
     if check_agent():
+
         if request.method == 'POST':
+
+
             min = float(request.form['min'])
             max = float(request.form['max'])
             location_name = request.form['location_name']
             type_id = request.form['type_id']
-            sql = 'select * from unit where cost between %s AND %s or location_name = %s or type_id = %s'
-            cursor = conn().cursor()
-            cursor.execute(sql, (min,max,location_name,type_id))
-
 
             sql1 = 'select * from property_location '
             cursor1 = conn().cursor()
@@ -1028,32 +1027,80 @@ def allocateunit():
             cursor2.execute(sql2)
             types = cursor2.fetchall()
 
-            if cursor.rowcount == 0:
-                flash('No units Found','info')
-                return redirect('allocateunit.html')
+
+            list = []
+            status = 'yes'
+            sql3 = 'select * from allocate_unit where status = %s'
+            cursor3 = conn().cursor()
+            cursor3.execute(sql3, (status))
+            allocated = cursor3.fetchall()
+            for row in allocated:
+                list.append(row[1])
+
+            if tuple(list):
+                sql4 = 'select * from unit where unit_id NOT IN %s and cost between %s AND %s AND location_name = %s AND type_id = %s'
+                cursor4 = conn().cursor()
+                cursor4.execute(sql4, [tuple(list),min, max, location_name,type_id])
+                rows = cursor4.fetchall()
             else:
-                rows = cursor.fetchall()
-                return render_template('allocateunit.html', rows=rows , locations=locations , types=types)
-        else:
-            sql = 'select * from unit '
-            cursor = conn().cursor()
-            cursor.execute(sql, )
+                sql4 = 'select * from unit where cost between %s AND %s AND location_name = %s AND type_id = %s'
+                cursor4 = conn().cursor()
+                cursor4.execute(sql4,(min,max,location_name,type_id))
+                rows = cursor4.fetchall()
 
-            sql1 = 'select * from property_location '
-            cursor1 = conn().cursor()
-            cursor1.execute(sql1 )
-            locations = cursor1.fetchall()
 
-            sql2 = 'select * from unit_type '
-            cursor2 = conn().cursor()
-            cursor2.execute(sql2)
-            types = cursor2.fetchall()
-
-            if cursor.rowcount == 0:
-                return render_template('allocateunit.html',)
+            if cursor4.rowcount == 0:
+                return render_template('allocateunit.html', msg='No Unit Found' ,locations=locations, types=types)
             else:
-                rows = cursor.fetchall()
+
                 return render_template('allocateunit.html', rows=rows, locations=locations, types=types)
+        else:
+                list = []
+                status = 'yes'
+                sql3 = 'select * from allocate_unit where status = %s'
+                cursor3 = conn().cursor()
+                cursor3.execute(sql3,(status))
+                allocated = cursor3.fetchall()
+                for row in allocated:
+                    list.append(row[1])
+
+                if tuple(list):
+                    sql4 = 'select * from unit where unit_id NOT IN %s'
+                    cursor4 = conn().cursor()
+                    cursor4.execute(sql4, [tuple(list)])
+                    rows = cursor4.fetchall()
+                else:
+                    sql4 = 'select * from unit '
+                    cursor4 = conn().cursor()
+                    cursor4.execute(sql4 )
+                    rows = cursor4.fetchall()
+
+
+
+
+
+
+
+
+
+
+
+
+                sql1 = 'select * from property_location '
+                cursor1 = conn().cursor()
+                cursor1.execute(sql1 )
+                locations = cursor1.fetchall()
+
+                sql2 = 'select * from unit_type '
+                cursor2 = conn().cursor()
+                cursor2.execute(sql2)
+                types = cursor2.fetchall()
+
+                if cursor4.rowcount == 0:
+                    return render_template('allocateunit.html',)
+                else:
+
+                    return render_template('allocateunit.html', rows=rows, locations=locations, types=types)
 
     else:
         return redirect('/agent_login')
@@ -1140,6 +1187,7 @@ def saveunit():
 @app.route('/tenantallocate/<unit_id>', methods = ['POST','GET'])
 def tenantallocate(unit_id):
     if request.method == 'POST':
+
         email = request.form['email']
         cursor = conn().cursor()
         sql = 'select * from tenants where email = %s'
