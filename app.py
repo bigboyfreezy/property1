@@ -710,8 +710,16 @@ def searchtenant():
             if cursor.rowcount == 0:
                 return render_template('searchtenant.html', msg='No Records')
             else:
-                rows = cursor.fetchall()
-                return render_template('searchtenant.html', rows=rows)
+                row = cursor.fetchone()
+                sql = 'select * from allocate_unit where tenant_id = %s'
+                cursor = conn().cursor()
+                cursor.execute(sql, (row[0]))
+                if cursor.rowcount == 0:
+                    flash('This Tenant Has Not Been Allocated', 'danger')
+                    return redirect('/searchtenant')
+                else:
+                    units = cursor.fetchall()
+                    return render_template('searchtenant.html', row = row ,units=units)
 
         else:
             sql = 'select * from tenants order by reg_date DESC'
@@ -725,6 +733,17 @@ def searchtenant():
                 return render_template('searchtenant.html', rows= rows)
     else:
         return redirect('/agent_login')
+
+@app.route('/deallocate/<allocate_id>')
+def deallocate(allocate_id):
+    status = 'no'
+    sql = 'update allocate_unit set status = %s where allocate_id = %s'
+    cursor = con.cursor()
+    cursor.execute(sql,(status, allocate_id))
+    con.commit()
+    return redirect('/searchtenant')
+
+
 
 @app.route('/searchlandlord', methods = ['POST','GET'])
 def searchlandlord():
@@ -753,6 +772,8 @@ def searchlandlord():
                 return render_template('searchlandlord.html', rows= rows)
     else:
         return redirect('/agent_login')
+
+
 
 
 @app.route('/searchproperty', methods = ['POST','GET'])

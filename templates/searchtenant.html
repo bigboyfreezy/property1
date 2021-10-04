@@ -76,7 +76,7 @@
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                {% if rows %}
+                                {% if row %}
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
                                     <thead>
@@ -90,7 +90,7 @@
                                         </tr>
                                     </thead>
                                     <tfoot>
-                                    {% for row in rows %}
+
 
 
 
@@ -103,6 +103,12 @@
                                            <td>{{row[5]}}</td>
                                             <td>{{row[9]}}</td>
                                           <td>{{row[10]}}</td>
+
+                                            <td>
+                                            <a href="/viewallocatedunit/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
+                                                <i class="fas fa-eye " style="color:red;"><br>VIEW ALLOCATION</i>
+                                            </a>
+                                            </td>
                                             <td>
                                             <a href="/deletetenant/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
                                                 <i class="fas fa-trash-alt " style="color:red;"><br>DELETE TENANT</i>
@@ -113,8 +119,39 @@
                                                  <i class="fas fa-user-edit" style="color:red;"><br>EDIT TENANT</i></a></td>
                                         </tr>
                                 </tbody>
-                                    {% endfor %}
+
+
                                 </table>
+
+                                <br> <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+                                                  <thead>
+                                        <tr>
+                                            <th>Unit Id</th>
+                                            <th>Status</th>
+                                        </tr>
+                                 </thead>
+                                {% for unit in units %}
+                                 <tbody>
+                                        <tr>
+                                            <td>{{unit[0]}}</td>
+                                           <td>{{unit[3]}}</td>
+                                            {% if unit[3] == 'yes' %}
+
+                                            <td>
+                                                <a href="/deallocate/{{unit[0]}}">
+                                                    <i class="fas fa-user-times" style="color:red;"><br>DEALLOCATE</i></a></td>
+                                                </a>
+                                            </td>
+                                            {% else %}
+                                            {% endif %}
+                                        </tr>
+                                 </tbody>
+                                {% endfor %}
+                            </table>
+
+
+
                                 {% else %}
                                  <b style="color:red;">{{msg}}</b>
                                 {% endif %}
