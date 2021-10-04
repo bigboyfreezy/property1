@@ -47,7 +47,16 @@
                         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
+                    <br><b><h4>Search Tenant By Email</h4></b><br>
+                        <form action="/searchtenant" method="post" class="form-inline">
+                                <input type="email" name="email" placeholder="Enter Email" class="form-control">
+
+                                    <input type="submit" class="btn btn-info" value="search">
+
+
+                                </form>
                     <br><br>
+
 
                  <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -63,6 +72,7 @@
       {% endfor %}
    {% endif %}
 {% endwith %}</b><br>
+
 
                         <div class="card-body">
                             <div class="table-responsive">

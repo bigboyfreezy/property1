@@ -1037,6 +1037,7 @@ def allocateunit():
             for row in allocated:
                 list.append(row[1])
 
+
             if tuple(list):
                 sql4 = 'select * from unit where unit_id NOT IN %s and cost between %s AND %s AND location_name = %s AND type_id = %s'
                 cursor4 = conn().cursor()
