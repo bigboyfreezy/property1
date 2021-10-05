@@ -714,12 +714,18 @@ def searchtenant():
                 sql = 'select * from allocate_unit where tenant_id = %s'
                 cursor = conn().cursor()
                 cursor.execute(sql, (row[0]))
+
+                sql2 = 'select * from unit'
+                cursor1 = conn().cursor()
+                cursor1.execute(sql2)
+                unites = cursor1.fetchall()
+
                 if cursor.rowcount == 0:
                     flash('This Tenant Has Not Been Allocated', 'danger')
                     return redirect('/searchtenant')
                 else:
                     units = cursor.fetchall()
-                    return render_template('searchtenant.html', row = row ,units=units)
+                    return render_template('searchtenant.html', row = row ,units=units, unites=unites)
 
         else:
             sql = 'select * from tenants order by reg_date DESC'
@@ -733,6 +739,58 @@ def searchtenant():
                 return render_template('searchtenant.html', rows= rows)
     else:
         return redirect('/agent_login')
+
+@app.route('/rented')
+def rented():
+    sql = 'select * from allocate_unit where status = %s'
+    cursor = con.cursor()
+    cursor.execute(sql,('yes'))
+    if cursor.rowcount == 0:
+        flash('No Rented Houses', 'Info')
+        return redirect('/rented')
+    else:
+
+        #take it as a list append it then tuple it so that it can be used as laceholder
+        list=[]
+        units = cursor.fetchall()
+        for unit in units:
+            list.append(unit[1])
+        sql1 = 'select * from unit where unit_id IN %s'
+        cursor1 = con.cursor()
+        cursor1.execute(sql1,[tuple(list)])
+        houses = cursor1.fetchall()
+
+
+
+
+        sql2 = 'select * from property '
+        cursor2 = con.cursor()
+        cursor2.execute(sql2)
+        propers = cursor2.fetchall()
+
+        sql3 = 'select * from unit_type '
+        cursor3 = con.cursor()
+        cursor3.execute(sql3)
+        types = cursor3.fetchall()
+
+
+        return render_template('rented.html', houses = houses, propers = propers, types= types )
+
+@app.route('/tenant_in_unit/<unit_id>')
+def tenant_in_unit(unit_id):
+    sql = 'select * from allocate_unit where unit_id = %s and status = %s'
+    cursor = con.cursor()
+    cursor.execute(sql,(unit_id,'yes'))
+    row = cursor.fetchone()
+
+    sql1 = 'select * from tenants where tenant_id = %s'
+    cursor = con.cursor()
+    cursor.execute(sql1,(row[2]))
+    row = cursor.fetchone()
+    return render_template('tenants.html', row= row)
+
+
+
 
 @app.route('/deallocate/<allocate_id>')
 def deallocate(allocate_id):
