@@ -76,8 +76,8 @@
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                {% if row %}
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
                                     <thead>
                                         <tr>
@@ -94,7 +94,7 @@
 
 
 
-
+                                     {% for row in rows %}
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
@@ -118,10 +118,14 @@
                                                  <a href="/edit_tenant/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
                                                  <i class="fas fa-user-edit" style="color:red;"><br>EDIT TENANT</i></a></td>
                                         </tr>
+                                 {% endfor %}
                                 </tbody>
 
 
                                 </table>
+
+                                {% if row %}
+
 
                                 <br> <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 

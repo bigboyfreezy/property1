@@ -13,7 +13,7 @@ app.secret_key = 'A+4#s_T%P8g0@o?6'
 
 @app.route('/')
 def index():
-    if check_admin_agency_agent():
+    if check_admin_agency_agent_tenant():
 
         return render_template('index.html')
     else:
@@ -932,6 +932,9 @@ def profileagent():
     else:
         return redirect('/login')
 
+
+
+
 @app.route('/edit_tenant/<tenant_id>', methods = ['POST', 'GET'])
 def edit_tenant(tenant_id):
 
@@ -1295,6 +1298,67 @@ def commitallocation():
         return redirect(url_for('tenantallocate', unit_id=unit_id))
 
 
+#====================== Tenant Routes ======================
+
+@app.route('/tenant_login', methods=['GET','POST'])
+def tenant_login():
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+
+        # check if email exists
+        sql = 'select * from tenants where email = %s'
+        cursor = conn().cursor()
+        cursor.execute(sql, (email))
+        if cursor.rowcount == 0:
+            flash('Email does not exist', 'danger')
+            return redirect('/agent_login')
+        else:
+            row = cursor.fetchone()
+            hashed_password = row[4]
+            status = verify_password(hashed_password, password)
+            # verify
+            if status == True:
+                # create session
+                session['email'] = row[3]
+                session['tenant_id'] = row[0]
+                session['fname'] = row[1]
+                session['lname'] = row[2]
+                return redirect('/')
+
+            elif status == False:
+                flash('Wrong Email or Password', 'danger')
+                return redirect('/tenant_login')
+            else:
+                flash('Something went Wrong')
+                return redirect('/tenant_login')
+
+    else:
+        return render_template('tenant_login.html')
+
+
+@app.route('/profiletenant')
+def profiletenant():
+    if check_tenant():
+        sql = 'select * from tenants where tenant_id = %s'
+        cursor = conn().cursor()
+        session_key = session['tenant_id']
+        cursor.execute(sql, (session_key))
+        row = cursor.fetchone()
+        return render_template('profiletenant.html', row=row)
+    else:
+        return redirect('/tenant_login')
+
+
+
+
+def check_tenant():
+    if 'tenant_id' in session:
+        return True
+    else:
+        return False
+
+
 
 
 def check_admin():
@@ -1330,6 +1394,12 @@ def check_admin_agency():
 
 def check_admin_agency_agent():
     if 'admin_id' in session or 'agency_id' in session or 'agent_id' in session:
+        return True
+    else:
+        return  False
+
+def check_admin_agency_agent_tenant():
+    if 'admin_id' in session or 'agency_id' in session or 'agent_id' in session or 'tenant_id' in session:
         return True
     else:
         return  False
