@@ -776,6 +776,12 @@ def rented():
 
         return render_template('rented.html', houses = houses, propers = propers, types= types )
 
+
+
+
+
+
+
 @app.route('/tenant_in_unit/<unit_id>')
 def tenant_in_unit(unit_id):
     sql = 'select * from allocate_unit where unit_id = %s and status = %s'
@@ -1348,6 +1354,56 @@ def profiletenant():
         return render_template('profiletenant.html', row=row)
     else:
         return redirect('/tenant_login')
+
+
+@app.route('/sample')
+def sample():
+    if check_tenant():
+        status = 'yes'
+        tenant_id = session['tenant_id']
+        sql = 'select * from allocate_unit where status = %s and tenant_id = %s'
+        cursor = con.cursor()
+        cursor.execute(sql,(status,tenant_id))
+
+        if cursor.rowcount== 0:
+            return render_template('housedisplay.html', msg = "You Are Not Allocated'")
+        else:
+            rows = cursor.fetchall()
+            list = []
+            for row in rows:
+                list.append(row[1])
+            sql2 = 'select * from unit where unit_id IN %s'
+            cursor2 = con.cursor()
+            cursor2.execute(sql2,[tuple(list)]) #we are passing the row at which unit is in the allocate table and check it in the unit table to get the unit name
+            units = cursor2.fetchall()
+
+            sql3 = 'select * from unit_type'
+            cursor3 = conn().cursor()
+            cursor3.execute(sql3)
+            types = cursor3.fetchall()
+
+            sql4 = 'select * from property'
+            cursor4 = conn().cursor()
+            cursor4.execute(sql4)
+            props = cursor4.fetchall()
+
+            return render_template('housedisplay.html', units= units, types=types, props=props)
+    else:
+        return redirect('/tenant_login')
+
+
+@app.route('/process_payment' , methods = ['POST','GET'])
+def process_payment():
+    if request.method == 'POST':
+        phone = str(request.form['phone'])
+
+        amount = '1'
+        from payment import mpesa_payment
+        mpesa_payment(phone,amount)
+        flash('Please Complete Payment On Your Phone')
+        return redirect('/sample')
+    else:
+        flash('Payment Processing Failed')
 
 
 
