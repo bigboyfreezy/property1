@@ -43,56 +43,36 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Tenant Profile</h1>
-                        <a href="/" class=" d-sm-inline-block btn btn-sm btn-primary shadow-lg"><i
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                        <a href="/profiletenant" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="far fa-hand-point-left  text-white"><br> BACK</i></a>
                     </div>
                     <br><br>
-                                 <div class="card-body">
-                            <div class="table-responsive">
-                                {% if row %}
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                             <b>{% with messages = get_flashed_messages(with_categories=true) %}
+   {% if messages %}
+      {% for category, message in messages %}
+                            <div class="alert alert-{{category}}" role="alert">
+                                 {{ message }}
+                            </div>
 
-                                    <thead>
-                                        <tr>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Email</th>
-                                            <th>Active</th>
-                                            <th>Phone</th>
-                                            <th>Company Name</th>
-                                        </tr>
-                                    </thead>
-                                    <tfoot>
-
-
-
-
-
-                                    <tbody>
-                                        <tr>
-                                            <td>{{row[1]}}</td>
-                                           <td>{{row[2]}}</td>
-                                            <td>{{row[3]}}</td>
-                                           <td>{{row[5]}}</td>
-                                            <td>{{row[9]}}</td>
-                                          <td>{{row[10]}}</td>
-                                            <td>
-                                            <a href="/delete_agency/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
-                                                <i class="fas fa-trash-alt " style="color:red;"></i>
-                                            </a>
-                                            </td>
-                                             <td>
-                                                 <a href="/te/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
-                                                 <i class="fas fa-user-edit" style="color:red;"></i></a></td>
-                                        </tr>
-                                </tbody>
-
-                                    {% else %}
-                                    {% endif %}
-                                </table>
-                    <br><br>
-                                <center> <a href="/tenantchange" class="btn btn-info">Change Password</a></center>
+      {% endfor %}
+   {% endif %}
+{% endwith %}</b><br>
+         <form class="user" action="/tenantchange" method="POST" >
+                                        <div class="form-group">
+                                            <input type="password" name="currentpassword" class="form-control form-control-user"
+                                                id="exampleInputEmail" aria-describedby="emailHelp"
+                                                placeholder="Current Password" >
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                id="exampleInputPassword" placeholder="New Password" name="newpassword">
+                                        </div>
+                                    <div class="form-group">
+                                            <input type="password" class="form-control form-control-user"
+                                                 placeholder="Confirm Password" name="confirmpassword">
+                                        </div>
+             <input type="submit" value="Change Password" class="btn btn-info">
 
                     <br><br><br>
 

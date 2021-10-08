@@ -43,7 +43,7 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Tenant Profile</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Landlord Profile</h1>
                         <a href="/" class=" d-sm-inline-block btn btn-sm btn-primary shadow-lg"><i
                                 class="far fa-hand-point-left  text-white"><br> BACK</i></a>
                     </div>
@@ -77,14 +77,8 @@
                                            <td>{{row[5]}}</td>
                                             <td>{{row[9]}}</td>
                                           <td>{{row[10]}}</td>
-                                            <td>
-                                            <a href="/delete_agency/{{row[0]}}" onclick="return confirm('Are You sure you want to delete the record?');">
-                                                <i class="fas fa-trash-alt " style="color:red;"></i>
-                                            </a>
-                                            </td>
-                                             <td>
-                                                 <a href="/te/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
-                                                 <i class="fas fa-user-edit" style="color:red;"></i></a></td>
+
+
                                         </tr>
                                 </tbody>
 
@@ -92,7 +86,7 @@
                                     {% endif %}
                                 </table>
                     <br><br>
-                                <center> <a href="/tenantchange" class="btn btn-info">Change Password</a></center>
+                                <center> <a href="/landlordchange" class="btn btn-info">Change Password</a></center>
 
                     <br><br><br>
 

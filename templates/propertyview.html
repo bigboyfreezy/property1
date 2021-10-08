@@ -44,87 +44,80 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">PropertyDetails</h1>
-                        <a href="/searchlandlord" class=" d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-eye "></i> View Allocations</a>
+                        <a href="/searchlandlord" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-eye "></i> View Landlords</a>
                     </div>
                     <br><br>
-
 
                  <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">PROPERTY Details </h6>
                         </div>
-                      <b>
-                      </b><br>
+                      <b>{% with messages = get_flashed_messages(with_categories=true) %}
+   {% if messages %}
+      {% for category, message in messages %}
+                            <div class="alert alert-{{category}}" role="alert">
+                                 {{ message }}
+                            </div>
 
-
+      {% endfor %}
+   {% endif %}
+{% endwith %}</b><br>
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <br>
-                                {% with messages = get_flashed_messages(with_categories=true) %}
-                                   {% if messages %}
-                                      {% for category, message in messages %}
-                                      <div class="alert alert-{{category}}" role="alert">
-                                           {{ message }}
-                                      </div>
-                                      {% endfor %}
-                                   {% endif %}
-                                {% endwith %}
-
-                              <form action="/allocateunit" method="post" class="form-inline">
-                                <input type="number" name="min" placeholder="Enter Min Cost" class="form-control">
-                                <input type="number" name="max" placeholder="Enter Max Cost" class="form-control">
-                                   <select name="location_name" id="" class="form-control">
-                                     <option value="0">No location</option>
-                                 {% for location in locations %}
-                                 <option value="{{location[1]}}">{{location[1]}}</option>
-                                 {% endfor %}
-                                     </select>
-
-                                   <select name="type_id" id="" class="form-control">
-                                        <option value="0">No Type</option>
-
-                                 {% for type in types %}
-                                 <option value="{{type[0]}}">{{type[1]}}</option>
-                                 {% endfor %}
-                                     </select>
-
-
-                                  <br><input type="submit" class="btn btn-info justify-content-center" value="search">
-                                </form>
-
                                 {% if rows %}
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
                                     <thead>
                                         <tr>
-                                            <th>Code Name</th>
-                                            <th>Unit Type</th>
+                                            <th>Property Name</th>
+                                            <th>Address</th>
+                                            <th>Category</th>
                                             <th>Location</th>
-                                            <th>Cost</th>
-
 
                                         </tr>
                                     </thead>
-
+                                    <tfoot>
                                     {% for row in rows %}
+
+
+
 
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
-                                            <td>{{row[4]}}</td>
-                                            <td>{{row[6]}}</td>
+                                           <td>{{row[6]}}</td>
+                                            <td>
+                                                {% for category in categories %}
+                                                {% if row[4] == category[0] %}
+                                                  {{category[1]}}
+                                                {% endif %}
+                                                {% endfor %}
 
 
-                                          <td>{{row[7]}}</td>
-                                             <td> <a href="/tenantallocate/{{row[0]}}" onclick="return confirm('Do You Want To Allocate The Tenant To This Unit');">
-                                                <i class="fas fa-plus-square " style="color:red;"><br>ALLOCATE TO TENANT</i>
-                                            </a></td>
+                                            </td>
+                                            <td>  {% for location in locations %}
+                                                {% if row[7] == location[0] %}
+                                                  {{location[1]}}
+                                                {% endif %}
+                                                {% endfor %}
+                                            </td>
+
+
+                                             <td>
+                                                 <a href="/editproperty/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
+                                                 <i class="fas fa-user-edit" style="color:red;"><br>EDIT PROPERTY</i></a></td>
+
+
+
+                                              <td>
+                                                 <a href="/unitview/{{row[0]}}" >
+                                                 <i class="fas fa-eye" style="color:red;"><br>VIEW UNIT</i></a>
+                                            </td>
 
                                         </tr>
                                 </tbody>
-                                      <br>
                                     {% endfor %}
                                 </table>
                                 {% else %}

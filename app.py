@@ -13,7 +13,7 @@ app.secret_key = 'A+4#s_T%P8g0@o?6'
 
 @app.route('/')
 def index():
-    if check_admin_agency_agent_tenant():
+    if check_admin_agency_agent_tenant_landlord():
 
         return render_template('index.html')
     else:
@@ -1343,17 +1343,6 @@ def tenant_login():
         return render_template('tenant_login.html')
 
 
-@app.route('/profiletenant')
-def profiletenant():
-    if check_tenant():
-        sql = 'select * from tenants where tenant_id = %s'
-        cursor = conn().cursor()
-        session_key = session['tenant_id']
-        cursor.execute(sql, (session_key))
-        row = cursor.fetchone()
-        return render_template('profiletenant.html', row=row)
-    else:
-        return redirect('/tenant_login')
 
 
 @app.route('/sample')
@@ -1405,6 +1394,181 @@ def process_payment():
     else:
         flash('Payment Processing Failed')
 
+@app.route('/tenantchange', methods = ['POST', 'GET'])
+def tenantchange():
+    if check_tenant():
+        if request.method == 'POST':
+            session_key = session['tenant_id']
+            currentpassword = request.form['currentpassword']
+            newpassword = request.form['newpassword']
+            confirmpassword = request.form['confirmpassword']
+
+            sql = 'select * from tenants where tenant_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (session_key))
+            if cursor.rowcount==0:
+                return redirect('/logout')
+            else:
+                # fetchpassword..just one
+                row = cursor.fetchone()
+                hashed_password = row[4]
+                # verify the hashed and the password if they match
+                status = verify_password(hashed_password, currentpassword)
+                if status == True:
+                    # if new pass is not the same as confirm pass then they dont math and u render the template
+                    if newpassword !=confirmpassword:
+                        flash('The password dont match', 'danger')
+                        return render_template('tenantchange.html')
+                    else:
+                        con = pymysql.connect(host='localhost', user='root', password='', database='property')
+                        sql = 'UPDATE tenants SET password = %s where tenant_id = %s'
+                        cursor = con.cursor()
+                        cursor.execute(sql,(hash_password(newpassword), session_key))
+                        con.commit()
+                        flash('Password Changed')
+                        return render_template('tenantchange.html')
+
+                else:
+                    return render_template('tenantchange.html', msg = 'Current password is incorrect')
+
+
+        else:
+            return render_template('tenantchange.html')
+    else:
+       return redirect('/login')
+
+
+@app.route('/profiletenant')
+def profiletenant():
+    if check_tenant():
+        sql = 'select * from tenants where tenant_id = %s'
+        cursor = conn().cursor()
+        session_key = session['tenant_id']
+        cursor.execute(sql, (session_key))
+        row = cursor.fetchone()
+        return render_template('profiletenant.html', row=row)
+    else:
+        return redirect('/tenant_login')
+
+
+
+
+#==================== Landlord Template =========================
+
+@app.route('/landlord_login', methods=['GET','POST'])
+def landlord_login():
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+
+        # check if email exists
+        sql = 'select * from landlord where email = %s'
+        cursor = conn().cursor()
+        cursor.execute(sql, (email))
+        if cursor.rowcount == 0:
+            flash('Email does not exist', 'danger')
+            return redirect('/landlord_login')
+        else:
+            row = cursor.fetchone()
+            hashed_password = row[4]
+            status = verify_password(hashed_password, password)
+            # verify
+            if status == True:
+                # create session
+                session['email'] = row[3]
+                session['landlord_id'] = row[0]
+                session['fname'] = row[1]
+                session['lname'] = row[2]
+                return redirect('/')
+
+            elif status == False:
+                flash('Wrong Email or Password', 'danger')
+                return redirect('/landlord_login')
+            else:
+                flash('Something went Wrong')
+                return redirect('/landlord_login')
+
+    else:
+        return render_template('landlord_login.html')
+
+@app.route('/profilelandlord')
+def profilelandlord():
+    if check_landlord():
+        sql = 'select * from landlord where lardlord_id = %s'
+        cursor = conn().cursor()
+        session_key = session['landlord_id']
+        cursor.execute(sql, (session_key))
+        row = cursor.fetchone()
+        return render_template('profilelandlord.html', row=row)
+    else:
+        return redirect('/landlord_login')
+
+@app.route('/propertyview')
+def propertyview():
+    if check_landlord():
+        landlord_id = session['landlord_id']
+        sql = 'select * from property where landlord_id = %s'
+        cursor = conn().cursor()
+        cursor.execute(sql, (landlord_id))
+        #check if agency i
+        sql1 = 'select * from property_category'
+        cursor0 = conn().cursor()
+        cursor0.execute(sql1)
+        categories = cursor0.fetchall()
+        #fetching location
+        sql2 = 'select * from property_location'
+        cursor1 = conn().cursor()
+        cursor1.execute(sql2)
+        locations = cursor1.fetchall()
+
+
+
+
+        if cursor.rowcount == 0:
+            return render_template('propertyview.html', msg='No records')
+        else:
+            rows = cursor.fetchall()
+            return render_template('propertyview.html', rows=rows, categories=categories, locations=locations)
+
+    else:
+        return redirect('/landlord_login')
+
+@app.route('/unitview/<property_id>')
+def unitview(property_id):
+    if check_landlord():
+
+        sql = 'select * from unit where property_id = %s '
+        cursor = conn().cursor()
+        cursor.execute(sql, (property_id))
+
+
+        sql1 = 'select * from unit_type'
+        cursor0 = conn().cursor()
+        cursor0.execute(sql1)
+        types = cursor0.fetchall()
+
+        sql2 = 'select * from property_location'
+        cursor1 = conn().cursor()
+        cursor1.execute(sql2)
+        locations = cursor1.fetchall()
+
+
+
+        if cursor.rowcount == 0:
+            return render_template('unitview.html', msg='No records')
+        else:
+            rows = cursor.fetchall()
+            return render_template('unitview.html', rows=rows, property_id=property_id, locations=locations, types=types)
+
+    else:
+        return redirect('/landlord_login')
+
+
+def check_landlord():
+    if 'landlord_id' in session:
+        return True
+    else:
+        return False
 
 
 
@@ -1459,6 +1623,13 @@ def check_admin_agency_agent_tenant():
         return True
     else:
         return  False
+
+def check_admin_agency_agent_tenant_landlord():
+    if 'admin_id' in session or 'agency_id' in session or 'agent_id' in session or 'tenant_id' in session or 'landlord_id' in session:
+        return True
+    else:
+        return  False
+
 
 if __name__=='__main__':
     app.run(debug=True, port=8080)
