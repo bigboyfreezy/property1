@@ -1425,7 +1425,7 @@ def tenantchange():
                         cursor = con.cursor()
                         cursor.execute(sql,(hash_password(newpassword), session_key))
                         con.commit()
-                        flash('Password Changed')
+                        flash('Password Changed','info')
                         return render_template('tenantchange.html')
 
                 else:
@@ -1536,21 +1536,38 @@ def propertyview():
 @app.route('/unitview/<property_id>')
 def unitview(property_id):
     if check_landlord():
+        status = 'yes'
 
-        sql = 'select * from unit where property_id = %s '
-        cursor = conn().cursor()
-        cursor.execute(sql, (property_id))
+        sql = 'select * from allocate_unit where status = %s '
+        cursor = con.cursor()
+        cursor.execute(sql, (status, ))
+
+        if cursor.rowcount == 0:
+            return render_template('unitview.html', msg="You Are Not Allocated'",)
+        else:
+            rows = cursor.fetchall()
+            list = []
+            for row in rows:
+                list.append(row[1])
+            sql2 = 'select * from unit where unit_id IN %s'
+            cursor2 = con.cursor()
+            cursor2.execute(sql2, [tuple(list)])  # we are passing the row at which unit is in the allocate table and check it in the unit table to get the unit name
+            units = cursor2.fetchall()
+
+            sql = 'select * from unit where property_id = %s '
+            cursor = conn().cursor()
+            cursor.execute(sql, (property_id))
 
 
-        sql1 = 'select * from unit_type'
-        cursor0 = conn().cursor()
-        cursor0.execute(sql1)
-        types = cursor0.fetchall()
+            sql1 = 'select * from unit_type'
+            cursor0 = conn().cursor()
+            cursor0.execute(sql1)
+            types = cursor0.fetchall()
 
-        sql2 = 'select * from property_location'
-        cursor1 = conn().cursor()
-        cursor1.execute(sql2)
-        locations = cursor1.fetchall()
+            sql2 = 'select * from property_location'
+            cursor1 = conn().cursor()
+            cursor1.execute(sql2)
+            locations = cursor1.fetchall()
 
 
 
@@ -1558,10 +1575,54 @@ def unitview(property_id):
             return render_template('unitview.html', msg='No records')
         else:
             rows = cursor.fetchall()
-            return render_template('unitview.html', rows=rows, property_id=property_id, locations=locations, types=types)
+            return render_template('unitview.html', rows=rows, property_id=property_id, locations=locations, types=types, units=units, )
 
     else:
         return redirect('/landlord_login')
+
+@app.route('/landlordchange', methods = ['POST', 'GET'])
+def landlordchange():
+    if check_landlord():
+        if request.method == 'POST':
+            session_key = session['landlord_id']
+            currentpassword = request.form['currentpassword']
+            newpassword = request.form['newpassword']
+            confirmpassword = request.form['confirmpassword']
+
+            sql = 'select * from landlord where lardlord_id = %s'
+            cursor = conn().cursor()
+            cursor.execute(sql, (session_key))
+            if cursor.rowcount==0:
+                return redirect('/logout')
+            else:
+                # fetchpassword..just one
+                row = cursor.fetchone()
+                hashed_password = row[4]
+                # verify the hashed and the password if they match
+                status = verify_password(hashed_password, currentpassword)
+                if status == True:
+                    # if new pass is not the same as confirm pass then they dont math and u render the template
+                    if newpassword !=confirmpassword:
+                        flash('The password dont match', 'danger')
+                        return render_template('landlordchange.html')
+                    else:
+                        con = pymysql.connect(host='localhost', user='root', password='', database='property')
+                        sql = 'UPDATE landlord SET password = %s where lardlord_id = %s'
+                        cursor = con.cursor()
+                        cursor.execute(sql,(hash_password(newpassword), session_key))
+                        con.commit()
+                        flash('Password Changed','info')
+                        return render_template('landlordchange.html')
+
+                else:
+                    return render_template('landlordchange.html', msg = 'Current password is incorrect')
+
+
+        else:
+            return render_template('landlordchange.html')
+    else:
+       return redirect('/login')
+
 
 
 def check_landlord():

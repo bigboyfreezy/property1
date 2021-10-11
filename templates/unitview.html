@@ -72,7 +72,11 @@
                                     <thead>
                                         <tr>
                                             <th>Code Name</th>
-                                            <th>Unit Type</th>
+
+
+                                             <th>Unit Type</th>
+                                             <th>Location</th>
+                                             <th>Status</th>
 
 
                                         </tr>
@@ -86,7 +90,7 @@
                                     <tbody>
                                         <tr>
                                             <td>{{row[1]}}</td>
-                                           <td>{{row[4]}}</td>
+
                                             <td>
                                                 {% for type in types %}
                                                 {% if row[4] == type[0] %}
@@ -108,6 +112,10 @@
 
 
 
+
+
+
+
                                              <td>
                                                  <a href="/editunit/{{row[0]}}" onclick= "return confirm('Are You sure you want to Edit?');">
                                                  <i class="fas fa-user-edit" style="color:red;"><br>EDIT UNIT</i></a></td>
@@ -118,6 +126,49 @@
                                         </tr>
                                 </tbody>
                                     {% endfor %}
+                                </table>
+                                {% else %}
+                                 <b style="color:red;">{{msg}}</b>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                 </div>
+                     <div class="card-body">
+                            <div class="table-responsive">
+                                {% if rows %}
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Unit Code</th>
+
+
+
+
+
+                                        </tr>
+                                    </thead>
+
+
+
+
+
+
+                                    <tbody>
+
+                                            {% for unit in units %}
+                                            <td >{{unit[1]}}</td>
+                                            {% endfor %}
+
+
+
+
+
+
+
+                                </tbody>
+
                                 </table>
                                 {% else %}
                                  <b style="color:red;">{{msg}}</b>
