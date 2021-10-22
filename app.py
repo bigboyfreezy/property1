@@ -1196,30 +1196,6 @@ def allocateunit():
 
 
 
-@app.route('/landlord_property/<landlord_id>')
-def landlord_property(landlord_id):
-    sql = 'select * from property where landlord_id = %s'
-    cursor = conn().cursor()
-    cursor.execute(sql, (landlord_id))
-    #check if agency i
-    sql1 = 'select * from property_category'
-    cursor0 = conn().cursor()
-    cursor0.execute(sql1)
-    categories = cursor0.fetchall()
-    #fetching location
-    sql2 = 'select * from property_location'
-    cursor1 = conn().cursor()
-    cursor1.execute(sql2)
-    locations = cursor1.fetchall()
-
-
-
-
-    if cursor.rowcount == 0:
-        return render_template('landlord_property.html', msg='No records')
-    else:
-        rows = cursor.fetchall()
-        return render_template('landlord_property.html', rows=rows, categories=categories, locations=locations)
 
 @app.route('/addunit/<property_id>')
 def addunit(property_id):
@@ -1302,6 +1278,32 @@ def commitallocation():
 
         flash('Allocation Successful', 'info')
         return redirect(url_for('tenantallocate', unit_id=unit_id))
+
+
+@app.route('/landlord_property/<landlord_id>')
+def landlord_property(landlord_id):
+    sql = 'select * from property where landlord_id = %s'
+    cursor = conn().cursor()
+    cursor.execute(sql, (landlord_id))
+    #check if agency i
+    sql1 = 'select * from property_category'
+    cursor0 = conn().cursor()
+    cursor0.execute(sql1)
+    categories = cursor0.fetchall()
+    #fetching location
+    sql2 = 'select * from property_location'
+    cursor1 = conn().cursor()
+    cursor1.execute(sql2)
+    locations = cursor1.fetchall()
+
+
+
+
+    if cursor.rowcount == 0:
+        return render_template('landlord_property.html', msg='No records')
+    else:
+        rows = cursor.fetchall()
+        return render_template('landlord_property.html', rows=rows, categories=categories, locations=locations)
 
 
 #====================== Tenant Routes ======================
